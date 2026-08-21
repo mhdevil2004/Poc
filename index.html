@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Partner Bank Portal | Embedded Fintilla Host</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        min-height: 100vh;
+        margin: 0;
+        background: #f5f7fb;
+        color: #111827;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 48px;
+        background: #ffffff;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .brand {
+        font-size: 18px;
+        font-weight: 800;
+      }
+
+      .session {
+        color: #047857;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      main {
+        width: min(960px, calc(100% - 32px));
+        margin: 48px auto;
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 24px;
+      }
+
+      section,
+      aside {
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        background: #ffffff;
+        box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+      }
+
+      section {
+        padding: 40px;
+      }
+
+      aside {
+        padding: 28px;
+      }
+
+      h1 {
+        margin: 0 0 14px;
+        font-size: 42px;
+        line-height: 1.05;
+        letter-spacing: 0;
+      }
+
+      p {
+        color: #64748b;
+        line-height: 1.6;
+      }
+
+      .user-card {
+        display: grid;
+        gap: 18px;
+      }
+
+      .avatar {
+        display: grid;
+        width: 58px;
+        height: 58px;
+        place-items: center;
+        border-radius: 16px;
+        background: #111827;
+        color: white;
+        font-weight: 800;
+      }
+
+      .field {
+        display: grid;
+        gap: 5px;
+        border-top: 1px solid #eef2f7;
+        padding-top: 16px;
+      }
+
+      .field span {
+        color: #94a3b8;
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+
+      .field strong {
+        color: #0f172a;
+      }
+
+      button {
+        min-height: 48px;
+        border: 0;
+        border-radius: 10px;
+        background: #111827;
+        color: white;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: 800;
+      }
+
+      button:disabled {
+        cursor: wait;
+        opacity: 0.65;
+      }
+
+      #status {
+        min-height: 20px;
+        color: #b91c1c;
+        font-size: 13px;
+      }
+
+      #fintilla-sdk-root {
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        background: rgba(15, 23, 42, 0.72);
+      }
+
+      #fintilla-sdk-root.open {
+        display: flex;
+      }
+
+      .modal {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        border-radius: 0;
+        background: #020617;
+        box-shadow: none;
+      }
+
+      .close {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        z-index: 2;
+        width: 40px;
+        min-height: 40px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 999px;
+        background: rgba(2, 6, 23, 0.75);
+      }
+
+      iframe {
+        width: 100%;
+        height: 100%;
+        border: 0;
+      }
+
+      @media (max-width: 760px) {
+        header {
+          padding: 18px;
+        }
+
+        main {
+          grid-template-columns: 1fr;
+          margin-top: 24px;
+        }
+
+        h1 {
+          font-size: 32px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="brand">Partner Bank</div>
+      <div class="session">Logged in as Amit Sharma</div>
+    </header>
+
+    <main>
+      <section>
+        <h1>Apply for a premium personal loan</h1>
+        <p>
+          This is the partner bank portal. When the customer submits, the bank requests a secure SDK token from the Go backend and opens the full Fintilla Next.js bank-portal frontend inside this page.
+        </p>
+      </section>
+
+      <aside class="user-card">
+        <div class="avatar">AS</div>
+        <div class="field">
+          <span>Customer</span>
+          <strong>Amit Sharma</strong>
+        </div>
+        <div class="field">
+          <span>Bank User ID</span>
+          <strong>BANK-9921</strong>
+        </div>
+        <div class="field">
+          <span>Email</span>
+          <strong>amit.sharma@example.com</strong>
+        </div>
+        <div class="field">
+          <span>Phone</span>
+          <strong>+91 98765 43210</strong>
+        </div>
+        <button id="submitButton" type="button">Submit and Open Fintilla Portal</button>
+        <div id="status" role="status" aria-live="polite"></div>
+      </aside>
+    </main>
+
+    <div id="fintilla-sdk-root" aria-hidden="true">
+      <div class="modal" role="dialog" aria-modal="true" aria-label="Embedded Fintilla Portal">
+        <button id="closeButton" class="close" type="button" aria-label="Close Fintilla Portal">x</button>
+        <iframe id="sdkFrame" title="Embedded Fintilla Bank Portal" allow="payment *"></iframe>
+      </div>
+    </div>
+
+    <script>
+      const BACKEND_URL = "http://localhost:8080";
+      const SDK_URL = "http://localhost:3000";
+      const SDK_ORIGIN = new URL(SDK_URL).origin;
+
+      const bankUser = {
+        id: "BANK-9921",
+        name: "Amit Sharma",
+        email: "amit.sharma@example.com",
+        phone: "+91 98765 43210"
+      };
+
+      const submitButton = document.getElementById("submitButton");
+      const closeButton = document.getElementById("closeButton");
+      const root = document.getElementById("fintilla-sdk-root");
+      const frame = document.getElementById("sdkFrame");
+      const status = document.getElementById("status");
+
+      function openSdk(token) {
+        frame.src = `${SDK_URL}?sdk_token=${encodeURIComponent(token)}`;
+        root.classList.add("open");
+        root.setAttribute("aria-hidden", "false");
+      }
+
+      function closeSdk() {
+        root.classList.remove("open");
+        root.setAttribute("aria-hidden", "true");
+        frame.removeAttribute("src");
+      }
+
+      submitButton.addEventListener("click", async () => {
+        submitButton.disabled = true;
+        submitButton.textContent = "Creating secure session...";
+        status.textContent = "";
+
+        try {
+          const response = await fetch(`${BACKEND_URL}/api/v1/sdk/handshake`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(bankUser)
+          });
+          const payload = await response.json();
+
+          if (!response.ok) {
+            throw new Error(payload.message || "Unable to create SDK session");
+          }
+
+          openSdk(payload.sdk_token);
+        } catch (error) {
+          status.textContent = error.message;
+        } finally {
+          submitButton.disabled = false;
+          submitButton.textContent = "Submit and Open Fintilla Portal";
+        }
+      });
+
+      closeButton.addEventListener("click", closeSdk);
+
+      window.addEventListener("message", (event) => {
+        if (event.origin !== SDK_ORIGIN) return;
+
+        if (event.data && event.data.type === "FINTILLA_SUCCESS") {
+          status.style.color = "#047857";
+          status.textContent = "Application completed successfully.";
+          closeSdk();
+        }
+
+        if (event.data && event.data.type === "FINTILLA_CLOSE") {
+          closeSdk();
+        }
+      });
+    </script>
+  </body>
+</html>
