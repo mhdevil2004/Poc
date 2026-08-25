@@ -1,17 +1,19 @@
 package main
 
 import (
+	"LOAN/internal/agent"
 	"LOAN/internal/database"
 	"LOAN/internal/handlers"
 	"LOAN/internal/middleware"
 	"LOAN/internal/repository"
 	"LOAN/internal/service"
+	"LOAN/internal/tools"
 	"log"
 	"net/http"
 	"os"
 	"strings"
 
-	"://github.com"
+	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -20,6 +22,7 @@ func main() {
 		log.Println("No .env file found; assuming containerized environment variables are injected")
 	}
 
+	// ── Database ──────────────────────────────────────────────────────────
 	db, err := database.NewDB()
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
@@ -30,15 +33,26 @@ func main() {
 		log.Fatal("Failed to migrate database:", err)
 	}
 
+	// ── Repository → Service → Handlers (existing, untouched) ─────────────
 	loanRepo := repository.NewLoanRepository(db.DB)
 	loanService := service.NewLoanService(loanRepo)
 	loanHandler := handlers.NewLoanHandler(loanService)
 	sdkHandler := handlers.NewSDKHandler(handlers.SDKSecretFromEnv())
+	
+	interviewSvc := service.NewInterviewService()
+	interviewHandler := handlers.NewInterviewHandler(interviewSvc)
 
+	// ── Mux ───────────────────────────────────────────────────────────────
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/api/v1/sdk/handshake", sdkHandler.Handshake)
 	mux.HandleFunc("/api/v1/sdk/verify", sdkHandler.Verify)
+
+	// --- Interview Flow Endpoints ---
+	mux.HandleFunc("/api/v1/interview/start", interviewHandler.Start)
+	mux.HandleFunc("/api/v1/interview/state", interviewHandler.GetState)
+	mux.HandleFunc("/api/v1/interview/answer", interviewHandler.Answer)
+	mux.HandleFunc("/api/v1/interview/permission", interviewHandler.Permission)
 
 	mux.HandleFunc("/api/loans", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
@@ -97,6 +111,34 @@ func main() {
 	})
 	mux.HandleFunc("/docs", handlers.SwaggerUI)
 
+	// ── AI Agent (optional: skipped gracefully if GEMINI_API_KEY is absent) ──
+	// Composition: tools → agent → handler → route
+	// No Gemini logic, prompts, or tool definitions live here — they are in
+	// internal/agent/ and internal/tools/.
+	agentCfg, agentCfgErr := agent.AgentConfigFromEnv()
+	if agentCfgErr != nil {
+		log.Printf("AI Agent disabled: %v (set GEMINI_API_KEY to enable)", agentCfgErr)
+	} else {
+		// Register all tool executors. The agent whitelist enforces that only
+		// functions in this map can ever be invoked by the LLM.
+		toolRegistry := map[string]agent.ToolExecutor{
+			"check_loan_eligibility":    tools.NewEligibilityTool(loanService),
+			"calculate_emi":             tools.NewEMITool(),
+			"get_loan_status":           tools.NewLoanStatusTool(),
+			"get_customer_credit_score": tools.NewCustomerCreditTool(),
+			"create_loan_application":   tools.NewCreateLoanTool(loanService),
+		}
+
+		loanAgent, err := agent.NewLoanAgent(agentCfg, toolRegistry)
+		if err != nil {
+			log.Printf("AI Agent failed to initialise: %v — agent endpoint will not be available", err)
+		} else {
+			agentHandler := handlers.NewAgentHandler(loanAgent)
+			mux.HandleFunc("/api/v1/agent/chat", agentHandler.Chat)
+			log.Printf("AI Agent enabled (model: %s)", agentCfg.Model)
+		}
+	}
+
 	// 3. Ensure the app dynamically reads the port assigned by Docker/Production systems
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -105,7 +147,7 @@ func main() {
 
 	handler := middleware.CORS(mux)
 	log.Printf("Server starting on port :%s", port)
-	
-	// 4. Bound correctly to dynamic port without hardcoded "localhost", ensuring Docker can routing traffic
+
+	// 4. Bound correctly to dynamic port without hardcoded "localhost", ensuring Docker can route traffic
 	log.Fatal(http.ListenAndServe(":"+port, handler))
 }

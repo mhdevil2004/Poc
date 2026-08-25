@@ -28,7 +28,7 @@ func (s *LoanService) CreateLoan(req models.LoanRequest) (*models.Loan, error) {
 	loan := models.NewLoan(req, monthlyPayment, totalPayment, interestRate)
 
 	// Save to database
-	err := s.repo.Create(loan)  
+	err := s.repo.Create(loan)
 	if err != nil {
 		return nil, err
 	}
@@ -142,4 +142,65 @@ func (s *LoanService) validateLoanForApproval(loan *models.Loan) error {
 	}
 
 	return nil
+}
+
+// ─── Agent-facing methods ─────────────────────────────────────────────────
+// These methods are PURE CALCULATIONS — no database access.
+// They are called exclusively by the agent tool layer, never by handlers.
+
+// CheckEligibility evaluates whether a loan can be granted based on the
+// requested amount and term. It reuses the existing private business-logic
+// helpers so eligibility rules remain the single source of truth in the
+// service layer, not in the LLM.
+func (s *LoanService) CheckEligibility(amount float64, termMonths int) models.EligibilityResult {
+	// --- Validation guards ---
+	if amount <= 0 {
+		return models.EligibilityResult{
+			Eligible:        false,
+			Reason:          "Loan amount must be greater than zero.",
+			RequestedAmount: amount,
+			TermMonths:      termMonths,
+		}
+	}
+	if termMonths <= 0 || termMonths > 84 {
+		return models.EligibilityResult{
+			Eligible:        false,
+			Reason:          "Loan term must be between 1 and 84 months.",
+			RequestedAmount: amount,
+			TermMonths:      termMonths,
+		}
+	}
+
+	// --- Existing business rule: maximum loan amount ---
+	if amount > 1_000_000 {
+		return models.EligibilityResult{
+			Eligible:        false,
+			Reason:          "Loan amount exceeds the maximum allowed limit of ₹10,00,000.",
+			RequestedAmount: amount,
+			TermMonths:      termMonths,
+		}
+	}
+
+	// --- Reuse existing private helpers for rate and payment ---
+	rate := s.calculateInterestRate(amount, termMonths)
+	monthly := s.calculateMonthlyPayment(amount, rate, termMonths)
+	total := monthly * float64(termMonths)
+
+	return models.EligibilityResult{
+		Eligible:                true,
+		Reason:                  "Your loan request meets all eligibility criteria.",
+		RequestedAmount:         amount,
+		TermMonths:              termMonths,
+		InterestRate:            rate,
+		EstimatedMonthlyPayment: math.Round(monthly*100) / 100,
+		EstimatedTotalPayment:   math.Round(total*100) / 100,
+	}
+}
+
+// CalculateEMI returns the monthly payment and total payment for a given
+// principal, annual interest rate, and term. This is a pure calculation
+// exposed for the calculate_emi agent tool.
+func (s *LoanService) CalculateEMI(principal, annualRate float64, termMonths int) (monthlyPayment, totalPayment float64) {
+	monthly := s.calculateMonthlyPayment(principal, annualRate, termMonths)
+	return math.Round(monthly*100) / 100, math.Round(monthly*float64(termMonths)*100) / 100
 }

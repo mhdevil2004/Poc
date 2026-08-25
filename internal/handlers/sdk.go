@@ -26,10 +26,12 @@ type SDKHandler struct {
 }
 
 type BankUser struct {
-	ID    string `json:"id"`
-	Name  string `json:"name"`
-	Email string `json:"email"`
-	Phone string `json:"phone"`
+	ID         string  `json:"id"`
+	Name       string  `json:"name"`
+	Email      string  `json:"email"`
+	Phone      string  `json:"phone"`
+	LoanAmount float64 `json:"loan_amount"`
+	TermMonths int     `json:"term_months"`
 }
 
 type sdkClaims struct {

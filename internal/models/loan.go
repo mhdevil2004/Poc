@@ -56,3 +56,31 @@ type UpdateLoanDetailsRequest struct {
 	Amount        float64 `json:"amount"`
 	TermMonths    int     `json:"term_months"`
 }
+
+// ─── Agent / AI structs ────────────────────────────────────────────────────
+
+// EligibilityResult is the deterministic output of the loan eligibility
+// calculation performed by LoanService.CheckEligibility. The LLM never
+// computes these values — it only receives them as a tool result.
+type EligibilityResult struct {
+	Eligible                bool    `json:"eligible"`
+	Reason                  string  `json:"reason"`
+	RequestedAmount         float64 `json:"requested_amount"`
+	TermMonths              int     `json:"term_months"`
+	InterestRate            float64 `json:"interest_rate,omitempty"`
+	EstimatedMonthlyPayment float64 `json:"estimated_monthly_payment,omitempty"`
+	EstimatedTotalPayment   float64 `json:"estimated_total_payment,omitempty"`
+}
+
+// AgentChatRequest is the payload for POST /api/v1/agent/chat.
+type AgentChatRequest struct {
+	Message    string `json:"message"`
+	CustomerID string `json:"customer_id,omitempty"` // optional; no customer table yet
+}
+
+// AgentChatResponse is the JSON response returned from POST /api/v1/agent/chat.
+type AgentChatResponse struct {
+	Response string      `json:"response"`
+	ToolUsed string      `json:"tool_used,omitempty"`
+	Data     interface{} `json:"data,omitempty"`
+}
