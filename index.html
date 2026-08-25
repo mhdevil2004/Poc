@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Partner Bank Portal | Embedded Fintilla Host</title>
+    <title>Bank Central Asia Portal Embedded Fintilla Host</title>
     <style>
       * {
         box-sizing: border-box;
@@ -103,8 +103,17 @@
         text-transform: uppercase;
       }
 
-      .field strong {
+      .field strong,
+      .field input {
         color: #0f172a;
+      }
+
+      .field input {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        font: inherit;
       }
 
       button {
@@ -190,43 +199,38 @@
   </head>
   <body>
     <header>
-      <div class="brand">Partner Bank</div>
-      <div class="session">Logged in as Amit Sharma</div>
+      <div class="brand">Bank Central Asia</div>
+      <div class="session">Logged in as <span id="sessionName">Narmadha</span></div>
     </header>
 
     <main>
-      <section>
-        <h1>Apply for a premium personal loan</h1>
-        <p>
-          This is the partner bank portal. When the customer submits, the bank requests a secure SDK token from the Go backend and opens the full Fintilla Next.js bank-portal frontend inside this page.
-        </p>
-      </section>
+     
 
       <aside class="user-card">
-        <div class="avatar">AS</div>
+        <div class="avatar" id="avatar">NA</div>
         <div class="field">
           <span>Customer</span>
-          <strong>Amit Sharma</strong>
+          <input type="text" id="customerName" value="Narmadha" autocomplete="name" />
         </div>
         <div class="field">
           <span>Bank User ID</span>
-          <strong>BANK-9921</strong>
+          <input type="text" id="bankUserId" value="BCA-9921" />
         </div>
         <div class="field">
           <span>Email</span>
-          <strong>amit.sharma@example.com</strong>
+          <input type="email" id="customerEmail" value="narmadha.harish@example.com" autocomplete="email" />
         </div>
         <div class="field">
           <span>Phone</span>
-          <strong>+91 98765 43210</strong>
+          <input type="tel" id="customerPhone" value="+91 98765 43210" autocomplete="tel" />
         </div>
         <div class="field">
-          <span>Loan Amount (₹)</span>
-          <input type="number" id="loanAmount" value="100000" style="padding:8px; border-radius:4px; border:1px solid #ccc;" />
+          <span>Loan Amount (Rp)</span>
+          <input type="number" id="loanAmount" value="100000" />
         </div>
         <div class="field">
           <span>Tenure (Months)</span>
-          <input type="number" id="termMonths" value="36" style="padding:8px; border-radius:4px; border:1px solid #ccc;" />
+          <input type="number" id="termMonths" value="36" />
         </div>
         <button id="submitButton" type="button">Apply In Fintilla Portal</button>
         <div id="status" role="status" aria-live="polite"></div>
@@ -250,13 +254,30 @@
       const root = document.getElementById("fintilla-sdk-root");
       const frame = document.getElementById("sdkFrame");
       const status = document.getElementById("status");
+      const sessionName = document.getElementById("sessionName");
+      const avatar = document.getElementById("avatar");
+      const customerNameInput = document.getElementById("customerName");
+      const bankUserIdInput = document.getElementById("bankUserId");
+      const customerEmailInput = document.getElementById("customerEmail");
+      const customerPhoneInput = document.getElementById("customerPhone");
       const loanAmountInput = document.getElementById("loanAmount");
       const termMonthsInput = document.getElementById("termMonths");
 
       function openSdk(token) {
-        frame.src = `${SDK_URL}?sdk_token=${encodeURIComponent(token)}`;
+        frame.src = `${SDK_URL}/loans/apply?sdk_token=${encodeURIComponent(token)}`;
         root.classList.add("open");
         root.setAttribute("aria-hidden", "false");
+      }
+
+      function getInitials(name) {
+        const parts = name.trim().split(/\s+/).filter(Boolean);
+        return (parts[0]?.[0] || "U") + (parts[1]?.[0] || "");
+      }
+
+      function syncCustomerDisplay() {
+        const name = customerNameInput.value.trim() || "User";
+        sessionName.textContent = name;
+        avatar.textContent = getInitials(name).toUpperCase();
       }
 
       function closeSdk() {
@@ -271,10 +292,10 @@
         status.textContent = "";
 
         const bankUser = {
-          id: "BANK-9921",
-          name: "Amit Sharma",
-          email: "amit.sharma@example.com",
-          phone: "+91 98765 43210",
+          id: bankUserIdInput.value.trim(),
+          name: customerNameInput.value.trim(),
+          email: customerEmailInput.value.trim(),
+          phone: customerPhoneInput.value.trim(),
           loan_amount: parseFloat(loanAmountInput.value) || 0,
           term_months: parseInt(termMonthsInput.value) || 0
         };
@@ -299,6 +320,9 @@
           submitButton.textContent = "Submit and Open Fintilla Portal";
         }
       });
+
+      customerNameInput.addEventListener("input", syncCustomerDisplay);
+      syncCustomerDisplay();
 
       closeButton.addEventListener("click", closeSdk);
 

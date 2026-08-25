@@ -87,7 +87,7 @@ export function LoanForm({
             />
 
             <Input
-              label="Loan Amount ($)"
+              label="Loan Amount (Rp)"
               type="number"
               placeholder="50000"
               error={errors.amount?.message}

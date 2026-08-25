@@ -99,7 +99,7 @@ func TestCheckEligibility_BoundaryAmount(t *testing.T) {
 		t.Errorf("expected eligible=true for amount=1,000,000 (boundary), got false: %s", result.Reason)
 	}
 
-	// One rupee over the limit: should be ineligible.
+	// One Rp over the limit: should be ineligible.
 	result = svc.CheckEligibility(1_000_001, 24)
 	if result.Eligible {
 		t.Error("expected eligible=false for amount=1,000,001 (over boundary)")
@@ -116,7 +116,7 @@ func TestCalculateEMI_BasicMath(t *testing.T) {
 	// Total should equal monthly * term (rounded).
 	expected := monthly * 12
 	if total != expected {
-		// Allow for rounding difference of at most 1 rupee.
+		// Allow for rounding difference of at most 1 Rp.
 		diff := total - expected
 		if diff < -1 || diff > 1 {
 			t.Errorf("total=%.2f does not match monthly*12=%.2f", total, expected)

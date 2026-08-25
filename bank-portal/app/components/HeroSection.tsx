@@ -5,7 +5,7 @@ import Link from 'next/link';
 import {
   ArrowRight,
   ChevronDown,
-  CircleDollarSign,
+  Landmark,
   ShieldCheck,
   Sparkles,
   TrendingUp,
@@ -14,7 +14,7 @@ import {
 const navItems = ['Credit Score', 'Loans', 'Investments', 'Insights'];
 
 const metrics = [
-  { label: 'Approved capital', value: '$18.4M', icon: CircleDollarSign, tone: 'blue' },
+  { label: 'Requested Credit', value: 'Rp 18.4M', icon: Landmark, tone: 'blue' },
   { label: 'Risk accuracy', value: '98.7%', icon: ShieldCheck, tone: 'emerald' },
 ];
 
@@ -72,7 +72,7 @@ export default function HomeSection() {
         <div className="max-w-2xl space-y-7">
           <div className="inline-flex items-center gap-2 rounded-full border border-white bg-white/70 px-4 py-2 text-sm font-semibold text-slate-600 shadow-[0_8px_30px_rgb(0,0,0,0.04)] backdrop-blur-xl">
             <Sparkles className="h-4 w-4 text-blue-600" />
-            Premium lending workspace
+            Premium CreditScore Engine
           </div>
 
           <div className="space-y-4">
@@ -80,7 +80,7 @@ export default function HomeSection() {
               Banking operations, beautifully focused.
             </h1>
             <p className="max-w-lg text-lg font-medium leading-8 text-slate-500">
-              A clean command center for loans, approvals, risk checks, and customer decisions.
+              A clean command center for loans, Requests, risk checks, and customer decisions.
             </p>
           </div>
 
@@ -181,7 +181,7 @@ export default function HomeSection() {
             <div className="mt-4 bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 transition-transform hover:-translate-y-1">
               <div className="mb-5 flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-500">Approval velocity</p>
+                  <p className="text-sm font-medium text-slate-500">Request velocity</p>
                   <p className="text-xl font-bold tracking-tight text-slate-900">Monthly funding trend</p>
                 </div>
                 <div className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-600">
@@ -230,8 +230,8 @@ export default function HomeSection() {
 
             <div className="mt-4 flex items-center justify-between bg-white rounded-3xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 transition-transform hover:-translate-y-1">
               <div>
-                <p className="text-sm font-medium text-slate-500">Latest approval</p>
-                <p className="mt-1 text-lg font-bold tracking-tight text-slate-900">$485,000 term loan</p>
+                <p className="text-sm font-medium text-slate-500">Latest Request</p>
+                <p className="mt-1 text-lg font-bold tracking-tight text-slate-900">Rp 485,000 term loan</p>
               </div>
               <div className="rounded-md bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-600">
                 Low risk

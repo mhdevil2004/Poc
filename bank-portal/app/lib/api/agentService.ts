@@ -43,9 +43,9 @@ export interface ApplicationContext {
 function buildContextPreamble(ctx: ApplicationContext): string {
   const parts: string[] = ["[Current application context:"];
   if (ctx.applicantName) parts.push(`Applicant: ${ctx.applicantName}`);
-  if (ctx.loanAmount)    parts.push(`Loan amount: ₹${ctx.loanAmount.toLocaleString("en-IN")}`);
+  if (ctx.loanAmount)    parts.push(`Loan amount: Rp ${ctx.loanAmount.toLocaleString("id-ID")}`);
   if (ctx.termMonths)    parts.push(`Tenure: ${ctx.termMonths} months`);
-  if (ctx.monthlyIncome) parts.push(`Monthly income: ₹${ctx.monthlyIncome.toLocaleString("en-IN")}`);
+  if (ctx.monthlyIncome) parts.push(`Monthly income: Rp ${ctx.monthlyIncome.toLocaleString("id-ID")}`);
   if (ctx.employmentType) parts.push(`Employment: ${ctx.employmentType}`);
   parts.push("]");
   return parts.join(" | ");

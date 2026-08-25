@@ -1,6 +1,6 @@
 "use client";
 
-import { IndianRupee, Calendar, FileText } from "lucide-react";
+import { Calendar, FileText } from "lucide-react";
 import type { ApplicationFormData } from "@/components/loans/types";
 
 interface Step3Props {
@@ -25,10 +25,12 @@ export function Step3LoanDetails({ data, onChange, errors }: Step3Props) {
         {/* Loan Amount */}
         <div>
           <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-            Requested Loan Amount (₹) <span className="text-red-500">*</span>
+            Requested Loan Amount (Rp) <span className="text-red-500">*</span>
           </label>
           <div className="relative">
-            <IndianRupee className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
+            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-[#9CA3AF]">
+              Rp
+            </span>
             <input
               id="amount"
               type="number"
@@ -50,7 +52,7 @@ export function Step3LoanDetails({ data, onChange, errors }: Step3Props) {
             <p className="mt-1.5 text-xs text-red-600 font-medium">{errors.amount}</p>
           )}
           <p className="mt-1.5 text-xs text-slate-500">
-            Maximum: ₹10,00,000. Minimum: ₹1.
+            Maximum: Rp 10.000.000. Minimum: Rp 1.
           </p>
         </div>
 

@@ -23,9 +23,9 @@ function ReviewRow({ label, value }: { label: string; value: string }) {
 
 export function Step4Review({ data, eligibility, eligibilityLoading, onCheckEligibility }: Step4Props) {
   const employmentLabel: Record<string, string> = {
-    business: "Business",
-    shop_owner: "Shop Owner",
-    work_leverage: "Work Leverage",
+    Warung: "Warung",
+    Tokokelontong: "Tokokelontong",
+    Ojek: "Ojek",
   };
 
   return (

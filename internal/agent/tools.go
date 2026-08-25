@@ -36,7 +36,7 @@ func checkLoanEligibilityDecl() *genai.FunctionDeclaration {
 			Properties: map[string]*genai.Schema{
 				"amount": {
 					Type:        genai.TypeNumber,
-					Description: "The requested loan amount in Indian Rupees (₹). Must be greater than 0 and at most 10,00,000.",
+					Description: "The requested loan amount in Indian Rps (₹). Must be greater than 0 and at most 10,00,000.",
 				},
 				"term_months": {
 					Type:        genai.TypeInteger,
@@ -124,7 +124,7 @@ func createLoanApplicationDecl() *genai.FunctionDeclaration {
 			Properties: map[string]*genai.Schema{
 				"amount": {
 					Type:        genai.TypeNumber,
-					Description: "The requested loan amount in Indian Rupees (₹).",
+					Description: "The requested loan amount in Indian Rps (₹).",
 				},
 				"term_months": {
 					Type:        genai.TypeInteger,

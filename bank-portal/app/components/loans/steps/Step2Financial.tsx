@@ -1,6 +1,6 @@
 "use client";
 
-import { Briefcase, IndianRupee, TrendingDown } from "lucide-react";
+import { Briefcase, TrendingDown } from "lucide-react";
 import type { ApplicationFormData } from "@/components/loans/types";
 
 interface Step2Props {
@@ -10,9 +10,9 @@ interface Step2Props {
 }
 
 const EMPLOYMENT_TYPES = [
-  { value: "business", label: "Business" },
-  { value: "shop_owner", label: "Shop Owner" },
-  { value: "work_leverage", label: "Work Leverage" },
+  { value: "Warung", label: "Warung" },
+  { value: "Tokokelontong", label: "Tokokelontong" },
+  { value: "Ojek", label: "Ojek" },
 ];
 
 export function Step2Financial({ data, onChange, errors }: Step2Props) {
@@ -26,10 +26,10 @@ export function Step2Financial({ data, onChange, errors }: Step2Props) {
       </div>
 
       <div className="space-y-4">
-        {/* Employment Type */}
+        {/* Business Type */}
         <div>
           <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-            Employment Type <span className="text-red-500">*</span>
+            Business Type <span className="text-red-500">*</span>
           </label>
           <div className="relative">
             <Briefcase className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF] pointer-events-none z-10" />
@@ -61,10 +61,12 @@ export function Step2Financial({ data, onChange, errors }: Step2Props) {
         {/* Monthly Income */}
         <div>
           <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-            Monthly Income (₹) <span className="text-red-500">*</span>
+            Monthly Income (Rp) <span className="text-red-500">*</span>
           </label>
           <div className="relative">
-            <IndianRupee className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
+            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-[#9CA3AF]">
+              Rp
+            </span>
             <input
               id="monthlyIncome"
               type="number"
@@ -89,7 +91,7 @@ export function Step2Financial({ data, onChange, errors }: Step2Props) {
         {/* Existing Monthly Obligations */}
         <div>
           <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-            Existing Monthly Obligations (₹)
+            Existing Monthly Obligations (Rp)
           </label>
           <div className="relative">
             <TrendingDown className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />

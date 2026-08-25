@@ -9,7 +9,7 @@ export const loanSchema = z.object({
   amount: z
     .number({ error: "Amount is required" })
     .positive("Amount must be greater than 0")
-    .max(10000000, "Amount cannot exceed $10,000,000"),
+    .max(10000000, "Amount cannot exceed Rp 10.000.000"),
   termMonths: z
     .number({ error: "Term is required" })
     .int("Term must be a whole number")

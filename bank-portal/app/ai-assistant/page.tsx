@@ -11,10 +11,10 @@ import { cn } from "@/lib/utils/formatters";
 
 // ─── Suggested prompts ──────────────────────────────────────────────────────
 const SUGGESTED_PROMPTS = [
-  "Can I get a loan of ₹5,00,000?",
-  "Check eligibility for ₹2,00,000 over 24 months",
-  "What's the interest rate for a ₹10,00,000 loan?",
-  "Am I eligible for a 36-month loan of ₹3,50,000?",
+  "Can I get a loan of Rp 500.000?",
+  "Check eligibility for Rp 200.000 over 24 months",
+  "What's the interest rate for a Rp 10.000.000 loan?",
+  "Am I eligible for a 36-month loan of Rp 350.000?",
 ];
 
 // ─── Markdown-lite renderer (bold + bullets only) ───────────────────────────
@@ -451,8 +451,8 @@ export default function AIAssistantPage() {
             </div>
             <div className="space-y-3">
               {[
-                { label: "Minimum", value: "₹1,000", color: "text-green-400" },
-                { label: "Maximum", value: "₹10,00,000", color: "text-[#D4AF37]" },
+                { label: "Minimum", value: "Rp 1.000", color: "text-green-400" },
+                { label: "Maximum", value: "Rp 10.000.000", color: "text-[#D4AF37]" },
                 { label: "Min Term", value: "1 month", color: "text-blue-400" },
                 { label: "Max Term", value: "84 months", color: "text-purple-400" },
               ].map((item) => (

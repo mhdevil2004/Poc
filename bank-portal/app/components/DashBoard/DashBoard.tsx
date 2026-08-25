@@ -16,30 +16,9 @@ import {
   ChevronDown,
   MoreVertical,
   CreditCard,
-  Building2,
-  Landmark,
-  Receipt,
-  DollarSign,
-  Zap,
-  Wifi,
-  Car,
-  House,
   Clock,
   CheckCircle,
-  AlertCircle,
-  User,
-  LogOut,
-  Menu,
-  TrendingUp,
-  TrendingDown,
   ArrowUpRight,
-  ArrowDownRight,
-  Droplets,
-  Briefcase as BriefcaseIcon,
-  Bolt,
-  Wifi as WifiIcon,
-  Home as HomeIcon,
-  Car as CarIcon,
   Eye,
   Download,
   Filter,
@@ -50,14 +29,9 @@ import {
   Area,
   XAxis,
   YAxis,
-  CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Cell,
 } from 'recharts';
-import { LoanForm } from '../loans/LoanForm';
-import type { CreateLoanInput } from '@/types';
-
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
 const sideNavItems = [
@@ -139,8 +113,6 @@ const SPARKLINE_DATA_3 = [55, 68, 72, 60, 78, 85, 65, 90, 75, 82, 70, 95, 80, 88
 
 export default function PaymentsDashboard() {
   const [loans, setLoans] = useState<ApiLoan[]>([]);
-  const [creatingLoan, setCreatingLoan] = useState(false);
-  const [formError, setFormError] = useState<string | null>(null);
 
   const loadLoans = useCallback(async () => {
     try {
@@ -160,32 +132,6 @@ export default function PaymentsDashboard() {
   useEffect(() => {
     loadLoans();
   }, [loadLoans]);
-
-  const handleCreateLoan = async (input: CreateLoanInput) => {
-    setCreatingLoan(true);
-    setFormError(null);
-
-    try {
-      const response = await fetch(`${API_URL}/api/loans`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          applicant_name: input.applicantName,
-          email: input.applicantEmail,
-          amount: input.amount,
-          term_months: input.termMonths,
-        }),
-      });
-
-      const payload = await response.json();
-      if (!response.ok) throw new Error(payload?.message || 'Unable to create loan');
-      await loadLoans();
-    } catch (error) {
-      setFormError(error instanceof Error ? error.message : 'Unable to create loan');
-    } finally {
-      setCreatingLoan(false);
-    }
-  };
 
   const chartData = useMemo(() => {
     const buckets = [
@@ -213,6 +159,37 @@ export default function PaymentsDashboard() {
   const approvedBalance = loans
     .filter((loan) => loan.status === 'approved' || loan.status === 'active')
     .reduce((sum, loan) => sum + Number(loan.amount || 0), 0);
+  const totalRequested = loans.reduce((sum, loan) => sum + Number(loan.amount || 0), 0);
+  const pendingBalance = loans
+    .filter((loan) => loan.status === 'pending')
+    .reduce((sum, loan) => sum + Number(loan.amount || 0), 0);
+  const approvedRatio = totalRequested ? approvedBalance / totalRequested : 0;
+  const pendingRatio = totalRequested ? pendingBalance / totalRequested : 0;
+  const creditScore = Math.round(Math.min(99, Math.max(35, 58 + approvedRatio * 34 - pendingRatio * 12 + Math.min(loans.length, 12))));
+  const creditLevel = creditScore >= 80 ? 'High' : creditScore >= 62 ? 'Medium' : 'Low';
+  const creditStyles = {
+    High: {
+      text: 'text-emerald-700',
+      bg: 'bg-emerald-50',
+      border: 'border-emerald-100',
+      bar: 'from-emerald-500 to-teal-500',
+      note: 'Strong repayment profile across the current loan book.',
+    },
+    Medium: {
+      text: 'text-amber-700',
+      bg: 'bg-amber-50',
+      border: 'border-amber-100',
+      bar: 'from-amber-500 to-orange-500',
+      note: 'Balanced portfolio with some applications still pending review.',
+    },
+    Low: {
+      text: 'text-rose-700',
+      bg: 'bg-rose-50',
+      border: 'border-rose-100',
+      bar: 'from-rose-500 to-red-500',
+      note: 'Needs attention before expanding the active credit exposure.',
+    },
+  }[creditLevel];
 
   const historyData = loans.slice(0, 8).map((loan, index) => ({
     id: loan.id,
@@ -220,7 +197,7 @@ export default function PaymentsDashboard() {
     email: '',
     time: new Date(loan.created_at).toLocaleTimeString(),
     amount: Number(loan.amount),
-    formattedAmount: `$${Number(loan.amount).toLocaleString()}`,
+    formattedAmount: `Rp ${Number(loan.amount).toLocaleString("id-ID")}`,
     status: loan.status,
     active: index === 1,
     reference: `LN-${loan.id}`,
@@ -232,20 +209,6 @@ export default function PaymentsDashboard() {
     }),
   }));
 
-  // Recent activities
-  const recentActivities = [
-    { icon: Droplets, label: 'Water Bill', status: 'Successfully', amount: '+$120' },
-    { icon: BriefcaseIcon, label: 'Income Salary', status: 'Received', amount: '+$4,500' },
-    { icon: Bolt, label: 'Electric Bill', status: 'Successfully', amount: '-$150' },
-    { icon: WifiIcon, label: 'Internet Bill', status: 'Successfully', amount: '-$60' },
-  ];
-
-  // Upcoming payments
-  const upcomingPayments = [
-    { icon: HomeIcon, label: 'Home Rent', status: 'Pending', amount: '$1,500' },
-    { icon: CarIcon, label: 'Car Insurance', status: 'Pending', amount: '$150' },
-  ];
-
   // Custom Tooltip for Area Chart
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -253,7 +216,7 @@ export default function PaymentsDashboard() {
         <div className="bg-slate-900 text-white text-xs font-medium px-3 py-2 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)]">
           <div className="flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-white/30" />
-            <p className="font-mono">${(payload[0].value / 1000).toFixed(1)}K</p>
+            <p className="font-mono">Rp {(payload[0].value / 1000).toFixed(1)}K</p>
           </div>
           <p className="text-[10px] text-white/40 mt-0.5">{label}</p>
         </div>
@@ -422,7 +385,7 @@ export default function PaymentsDashboard() {
                 </div>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Total Balance</p>
                 <p className="text-4xl font-bold text-slate-900 mt-1 tracking-tight tabular-nums">
-                  ${loans.reduce((s, l) => s + Number(l.amount || 0), 0).toLocaleString()}
+                  Rp {totalRequested.toLocaleString("id-ID")}
                 </p>
               </div>
             </div>
@@ -439,7 +402,7 @@ export default function PaymentsDashboard() {
                 </div>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Pending</p>
                 <p className="text-4xl font-bold text-slate-900 mt-1 tracking-tight tabular-nums">
-                  ${loans.filter((l) => l.status === 'pending').reduce((s, l) => s + Number(l.amount || 0), 0).toLocaleString()}
+                  Rp {pendingBalance.toLocaleString("id-ID")}
                 </p>
               </div>
             </div>
@@ -456,7 +419,7 @@ export default function PaymentsDashboard() {
                 </div>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Approved</p>
                 <p className="text-4xl font-bold text-slate-900 mt-1 tracking-tight tabular-nums">
-                  ${approvedBalance.toLocaleString()}
+                  Rp {approvedBalance.toLocaleString("id-ID")}
                 </p>
               </div>
             </div>
@@ -468,7 +431,7 @@ export default function PaymentsDashboard() {
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Balance Overview</p>
                 <p className="text-3xl font-bold text-slate-900 tracking-tight tabular-nums">
-                  ${approvedBalance.toLocaleString()}
+                  Rp {approvedBalance.toLocaleString("id-ID")}
                 </p>
               </div>
               <button className="text-xs font-medium text-[#9CA3AF] bg-[#F8FAFC] px-4 py-1.5 rounded-full hover:bg-[#F1F5F9] transition-colors flex items-center gap-1">
@@ -523,21 +486,49 @@ export default function PaymentsDashboard() {
             </div>
           </div>
 
-          {/* Loan application form */}
+          {/* Credit core system */}
           <section className="mb-8">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-lg font-bold text-slate-900 tracking-tight">New loan application</h2>
-                <p className="text-sm text-slate-500 font-medium">Submit a loan without leaving the dashboard.</p>
+            <div className="bg-white/70 backdrop-blur-xl border border-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-3xl p-6 lg:p-8 overflow-hidden relative">
+              <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-600 via-emerald-500 to-amber-400" />
+              <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Credit Core System</p>
+                  <h2 className="mt-2 text-2xl font-bold text-slate-900 tracking-tight">Portfolio health level</h2>
+                  <p className="mt-2 max-w-xl text-sm font-medium leading-6 text-slate-500">
+                    {creditStyles.note}
+                  </p>
+                </div>
+                <div className={`min-w-[180px] rounded-2xl border ${creditStyles.border} ${creditStyles.bg} px-5 py-4 text-center`}>
+                  <p className={`text-4xl font-bold tracking-tight ${creditStyles.text}`}>{creditLevel}</p>
+                  <p className="mt-1 text-xs font-bold uppercase tracking-widest text-slate-500">Level</p>
+                </div>
               </div>
-              <Link href="/loans/create" className="text-sm font-semibold text-slate-500 hover:text-slate-900">
-                Open full form
-              </Link>
+
+              <div className="mt-7 grid grid-cols-1 gap-4 md:grid-cols-3">
+                {[
+                  { label: 'Core Score', value: `${creditScore}/100` },
+                  { label: 'Approved Ratio', value: `${Math.round(approvedRatio * 100)}%` },
+                  { label: 'Pending Exposure', value: `Rp ${pendingBalance.toLocaleString("id-ID")}` },
+                ].map((item) => (
+                  <div key={item.label} className="rounded-2xl bg-slate-50/70 border border-white px-4 py-3">
+                    <p className="text-xs font-semibold text-slate-500">{item.label}</p>
+                    <p className="mt-1 text-lg font-bold text-slate-900 tabular-nums">{item.value}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-6 h-3 rounded-full bg-slate-100 overflow-hidden">
+                <div
+                  className={`h-full rounded-full bg-gradient-to-r ${creditStyles.bar}`}
+                  style={{ width: `${creditScore}%` }}
+                />
+              </div>
+              <div className="mt-2 flex justify-between text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                <span>Low</span>
+                <span>Medium</span>
+                <span>High</span>
+              </div>
             </div>
-            {formError && (
-              <p className="mb-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{formError}</p>
-            )}
-            <LoanForm onSubmit={handleCreateLoan} loading={creatingLoan} />
           </section>
 
           {/* History - Premium Table */}
@@ -669,97 +660,45 @@ export default function PaymentsDashboard() {
 
         {/* ============ RIGHT SIDEBAR ============ */}
         <aside className="w-[320px] max-w-[320px] p-6 flex flex-col overflow-y-auto overflow-x-hidden flex-shrink-0 no-scrollbar">
-          {/* Credit Card - Hyper-realistic Premium */}
-          <div className="mb-8">
-            <div className="bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 rounded-3xl p-6 ring-1 ring-inset ring-white/20 shadow-[0_8px_40px_rgb(0,0,0,0.18)] relative overflow-hidden">
-              {/* Noise texture overlay */}
-              <div 
-                className="absolute inset-0 pointer-events-none opacity-[0.03]"
-                style={{
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-                  backgroundSize: '256px 256px',
-                }}
-              />
-              <div className="flex justify-between items-start mb-6 relative z-10">
-                <div className="w-8 h-6 bg-gradient-to-b from-[#D4AF37] to-[#B8960F] rounded-md shadow-[0_2px_8px_rgba(212,175,55,0.3)]" />
-                <div className="flex items-center gap-0.5">
-                  <div className="w-6 h-6 rounded-full bg-[#EB001B]" />
-                  <div className="w-6 h-6 rounded-full bg-[#F79E1B] -ml-2" />
-                </div>
+          <div className="rounded-3xl border border-white bg-white/70 p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] backdrop-blur-xl">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Core Monitor</p>
+                <h3 className="mt-1 text-lg font-bold tracking-tight text-slate-900">Credit distribution</h3>
               </div>
-              <p className="text-gray-300 text-sm tracking-[0.15em] font-mono mb-4 relative z-10" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
-                4562 1122 4595 7852
-              </p>
-              <div className="flex justify-between items-end relative z-10">
-                <div>
-                  <p className="text-gray-500 text-[9px] uppercase tracking-wider">Card Holder</p>
-                  <p className="text-gray-300 text-sm font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>BRUCE WAYNE</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-gray-500 text-[9px] uppercase tracking-wider">Valid Thru</p>
-                  <p className="text-gray-300 text-sm font-medium" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>12/24</p>
-                </div>
+              <div className={`rounded-xl ${creditStyles.bg} ${creditStyles.text} px-3 py-2 text-sm font-bold`}>
+                {creditScore}
               </div>
             </div>
-          </div>
 
-          {/* Recent Activities - Premium */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-bold text-slate-900 tracking-tight">Recent Activities</h3>
-              <p className="text-xs text-slate-500 font-medium">02 Mar 2021</p>
-            </div>
-            <div className="space-y-3">
-              {recentActivities.map((activity, idx) => {
-                const Icon = activity.icon;
-                const isPositive = activity.amount.startsWith('+');
+            <div className="mt-6 space-y-4">
+              {[
+                { label: 'Approved', value: approvedBalance, color: 'bg-emerald-500' },
+                { label: 'Pending', value: pendingBalance, color: 'bg-amber-500' },
+                { label: 'Total', value: totalRequested, color: 'bg-blue-500' },
+              ].map((item) => {
+                const width = totalRequested ? Math.max(6, Math.round((item.value / totalRequested) * 100)) : 0;
                 return (
-                  <div key={idx} className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-gray-50 border border-gray-100 rounded-full flex items-center justify-center">
-                        <Icon className="w-4 h-4 text-gray-600" strokeWidth={1.5} />
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-slate-900">{activity.label}</p>
-                        <p className="text-xs text-gray-400">{activity.status}</p>
-                      </div>
+                  <div key={item.label}>
+                    <div className="mb-1.5 flex items-center justify-between text-xs font-semibold">
+                      <span className="text-slate-500">{item.label}</span>
+                      <span className="text-slate-900">Rp {item.value.toLocaleString("id-ID")}</span>
                     </div>
-                    <span className={`text-sm font-semibold tabular-nums ${
-                      isPositive ? 'text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md' : 'text-rose-600 bg-rose-50 px-2 py-1 rounded-md'
-                    }`}>
-                      {activity.amount}
-                    </span>
+                    <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
+                      <div className={`h-full rounded-full ${item.color}`} style={{ width: `${width}%` }} />
+                    </div>
                   </div>
                 );
               })}
             </div>
-          </div>
 
-          {/* Upcoming Payments - Premium */}
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-bold text-slate-900 tracking-tight">Upcoming Payments</h3>
-              <p className="text-xs text-slate-500 font-medium">13 Mar 2021</p>
-            </div>
-            <div className="space-y-3">
-              {upcomingPayments.map((payment, idx) => {
-                const Icon = payment.icon;
-                return (
-                  <div key={idx} className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-gray-50 border border-gray-100 rounded-full flex items-center justify-center">
-                        <Icon className="w-4 h-4 text-gray-600" strokeWidth={1.5} />
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-slate-900">{payment.label}</p>
-                        <p className="text-xs text-gray-400">{payment.status}</p>
-                      </div>
-                    </div>
-                    <span className="text-sm font-semibold text-slate-900 tabular-nums">{payment.amount}</span>
-                  </div>
-                );
-              })}
-            </div>
+            <Link
+              href="/loans/apply"
+              className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/30 transition-all hover:shadow-blue-500/50"
+            >
+              Start Application
+              <ArrowUpRight className="h-4 w-4" />
+            </Link>
           </div>
         </aside>
       </div>

@@ -51,7 +51,7 @@ function validateStep(step: number, data: ApplicationFormData): FieldErrors {
 
   if (step === 2) {
     if (!data.employmentType) {
-      errors.employmentType = "Please select your employment type";
+      errors.employmentType = "Please select your Business Type";
     }
     if (!data.monthlyIncome || data.monthlyIncome <= 0) {
       errors.monthlyIncome = "Monthly income must be greater than 0";
@@ -62,7 +62,7 @@ function validateStep(step: number, data: ApplicationFormData): FieldErrors {
     if (!data.amount || data.amount <= 0) {
       errors.amount = "Loan amount must be greater than 0";
     } else if (data.amount > 1_000_000) {
-      errors.amount = "Loan amount cannot exceed ₹10,00,000";
+      errors.amount = "Loan amount cannot exceed Rp 10.000.000";
     }
     if (!data.termMonths || data.termMonths <= 0) {
       errors.termMonths = "Loan tenure is required";
@@ -74,13 +74,47 @@ function validateStep(step: number, data: ApplicationFormData): FieldErrors {
   return errors;
 }
 
-// ─── Format Indian Rupee ───────────────────────────────────────────────────
-function formatINR(n: number): string {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
+// ─── Format Indian Rp ───────────────────────────────────────────────────
+function formatIDR(n: number): string {
+  return `Rp ${new Intl.NumberFormat("id-ID", {
     maximumFractionDigits: 0,
-  }).format(n);
+  }).format(n)}`;
+}
+
+function calculateEligibility(data: ApplicationFormData): EligibilityData {
+  const amount = data.amount || 0;
+  const termMonths = data.termMonths || 0;
+  const monthlyIncome = data.monthlyIncome || 0;
+  const obligations = data.existingObligations || 0;
+  const businessScore: Record<string, number> = {
+    Warung: 12,
+    Tokokelontong: 10,
+    Ojek: 8,
+  };
+  const monthlyPayment = termMonths > 0 ? amount / termMonths : amount;
+  const availableIncome = Math.max(monthlyIncome - obligations, 0);
+  const paymentRatio = availableIncome > 0 ? monthlyPayment / availableIncome : 1;
+  const score =
+    52 +
+    (amount <= 500_000 ? 12 : amount <= 1_000_000 ? 6 : -8) +
+    (termMonths <= 36 ? 10 : termMonths <= 60 ? 6 : 2) +
+    (paymentRatio <= 0.35 ? 18 : paymentRatio <= 0.55 ? 8 : -12) +
+    (businessScore[data.employmentType || ""] || 0);
+  const eligible = score >= 70;
+  const interestRate = score >= 85 ? 10.5 : score >= 70 ? 13.5 : 17.5;
+  const estimatedMonthlyPayment = amount && termMonths ? amount / termMonths : 0;
+
+  return {
+    eligible,
+    reason: eligible
+      ? "Profile meets the credit core threshold for this loan request."
+      : "Credit core score is below the current approval threshold.",
+    requested_amount: amount,
+    term_months: termMonths,
+    interest_rate: interestRate,
+    estimated_monthly_payment: estimatedMonthlyPayment,
+    estimated_total_payment: estimatedMonthlyPayment * termMonths,
+  };
 }
 
 // ─── SDK token decoder ─────────────────────────────────────────────────────
@@ -92,12 +126,12 @@ interface SDKUser {
   term_months?: number;
 }
 
-function decodeSDKToken(): SDKUser | null {
+function decodeSDKToken(token?: string | null): SDKUser | null {
   if (typeof window === "undefined") return null;
   try {
-    const token = sessionStorage.getItem("fintilla_sdk_token");
-    if (!token) return null;
-    const parts = token.split(".");
+    const sdkToken = token || sessionStorage.getItem("fintilla_sdk_token");
+    if (!sdkToken) return null;
+    const parts = sdkToken.split(".");
     if (parts.length !== 3) return null;
     const payload = JSON.parse(atob(parts[1].replace(/-/g, "+").replace(/_/g, "/")));
     return payload?.user ?? null;
@@ -149,7 +183,7 @@ function SuccessScreen({
         </div>
         <div className="flex items-center justify-between border-t border-white pt-3">
           <span className="text-sm text-slate-500">Requested Amount</span>
-          <span className="text-sm font-bold text-slate-900">{formatINR(amount)}</span>
+          <span className="text-sm font-bold text-slate-900">{formatIDR(amount)}</span>
         </div>
         <div className="flex items-center justify-between">
           <span className="text-sm text-slate-500">Tenure</span>
@@ -201,7 +235,14 @@ export default function LoanApplyPage() {
 
   // Pre-fill from SDK token on mount (partner-bank flow)
   useEffect(() => {
-    const sdkUser = decodeSDKToken();
+    const params = new URLSearchParams(window.location.search);
+    const urlToken = params.get("sdk_token");
+    if (urlToken) {
+      sessionStorage.setItem("fintilla_sdk_token", urlToken);
+      window.history.replaceState(null, "", window.location.pathname);
+    }
+
+    const sdkUser = decodeSDKToken(urlToken);
     if (sdkUser) {
       setFormData((prev) => ({
         ...prev,
@@ -254,13 +295,15 @@ export default function LoanApplyPage() {
     if (!formData.amount || !formData.termMonths) return;
     setEligibilityLoading(true);
     try {
-      const message = `Check eligibility for a loan of ₹${formData.amount} for ${formData.termMonths} months.`;
+      const message = `Check eligibility for a loan of Rp ${formData.amount} for ${formData.termMonths} months.`;
       const res = await sendAgentMessage(message, undefined, agentContext);
       if (res.data && typeof res.data === "object" && "eligible" in res.data) {
         setEligibility(res.data as EligibilityData);
+      } else {
+        setEligibility(calculateEligibility(formData));
       }
     } catch {
-      // silently fail — user can still proceed
+      setEligibility(calculateEligibility(formData));
     } finally {
       setEligibilityLoading(false);
     }

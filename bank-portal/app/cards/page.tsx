@@ -17,7 +17,7 @@ const cardProducts = [
   {
     name: "Fintilla Platinum",
     type: "Premium",
-    limit: "$50,000",
+    limit: "Rp 50.000",
     apr: "15.99%",
     rewards: "3x points on all purchases",
     color: "from-primary to-primary-700",
@@ -26,7 +26,7 @@ const cardProducts = [
   {
     name: "Fintilla Gold",
     type: "Standard",
-    limit: "$25,000",
+    limit: "Rp 25.000",
     apr: "18.99%",
     rewards: "2x points on dining & travel",
     color: "from-secondary to-secondary-600",
@@ -35,7 +35,7 @@ const cardProducts = [
   {
     name: "Fintilla Classic",
     type: "Starter",
-    limit: "$10,000",
+    limit: "Rp 10.000",
     apr: "21.99%",
     rewards: "1x points on all purchases",
     color: "from-gray-600 to-gray-800",

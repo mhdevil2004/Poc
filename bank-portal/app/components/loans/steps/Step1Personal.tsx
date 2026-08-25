@@ -32,7 +32,7 @@ export function Step1Personal({ data, onChange, errors }: Step1Props) {
               type="text"
               value={data.applicantName}
               onChange={(e) => onChange({ applicantName: e.target.value })}
-              placeholder="Amit Sharma"
+              placeholder="Customer name"
               className={`w-full pl-10 pr-4 py-3 rounded-2xl border text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-all shadow-[0_8px_30px_rgb(0,0,0,0.04)] ${
                 errors.applicantName
                   ? "border-red-300 focus:ring-red-100 bg-red-50/30"
@@ -57,7 +57,7 @@ export function Step1Personal({ data, onChange, errors }: Step1Props) {
               type="email"
               value={data.applicantEmail}
               onChange={(e) => onChange({ applicantEmail: e.target.value })}
-              placeholder="amit.sharma@example.com"
+              placeholder="customer@example.com"
               className={`w-full pl-10 pr-4 py-3 rounded-2xl border text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-all shadow-[0_8px_30px_rgb(0,0,0,0.04)] ${
                 errors.applicantEmail
                   ? "border-red-300 focus:ring-red-100 bg-red-50/30"
