@@ -10,5 +10,5 @@ type LoanStatusTool struct{}
 func NewLoanStatusTool() *LoanStatusTool { return &LoanStatusTool{} }
 
 func (t *LoanStatusTool) Execute(_ map[string]any) (map[string]any, error) {
-	return nil, fmt.Errorf("get_loan_status is not yet available in this version; please check your loan status through the Fintilla portal")
+	return nil, fmt.Errorf("get_loan_status is not yet available in this version; please check your loan status through the Fintillaa portal")
 }

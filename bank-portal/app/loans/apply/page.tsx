@@ -19,12 +19,12 @@ import type { ApplicationFormData } from "@/components/loans/types";
 
 // ─── Steps metadata ────────────────────────────────────────────────────────
 const STEPS = [
-  { id: 1, label: "Personal",   description: "Name & contact" },
-  { id: 2, label: "Financial",  description: "Income & employment" },
-  { id: 3, label: "Loan",       description: "Amount & tenure" },
-  { id: 4, label: "Review",     description: "Check eligibility" },
-  { id: 5, label: "Interview",  description: "Video verification" },
-  { id: 6, label: "Confirm",    description: "Submit application" },
+  { id: 1, label: "Personal", description: "Name & contact" },
+  { id: 2, label: "Financial", description: "Income & employment" },
+  { id: 3, label: "Loan", description: "Amount & tenure" },
+  { id: 4, label: "Review", description: "Check eligibility" },
+  { id: 5, label: "Interview", description: "Video verification" },
+  { id: 6, label: "Confirm", description: "Submit application" },
 ];
 
 // ─── Validation ────────────────────────────────────────────────────────────
@@ -129,7 +129,7 @@ interface SDKUser {
 function decodeSDKToken(token?: string | null): SDKUser | null {
   if (typeof window === "undefined") return null;
   try {
-    const sdkToken = token || sessionStorage.getItem("fintilla_sdk_token");
+    const sdkToken = token || sessionStorage.getItem("Fintilla_sdk_token");
     if (!sdkToken) return null;
     const parts = sdkToken.split(".");
     if (parts.length !== 3) return null;
@@ -155,7 +155,7 @@ function SuccessScreen({
   // Notify partner bank of success via postMessage (iframe flow)
   useEffect(() => {
     try {
-      window.parent.postMessage({ type: "FINTILLA_SUCCESS", loanId }, "*");
+      window.parent.postMessage({ type: "Fintilla_SUCCESS", loanId }, "*");
     } catch {
       // not in iframe, ignore
     }
@@ -238,7 +238,7 @@ export default function LoanApplyPage() {
     const params = new URLSearchParams(window.location.search);
     const urlToken = params.get("sdk_token");
     if (urlToken) {
-      sessionStorage.setItem("fintilla_sdk_token", urlToken);
+      sessionStorage.setItem("Fintilla_sdk_token", urlToken);
       window.history.replaceState(null, "", window.location.pathname);
     }
 
@@ -307,7 +307,7 @@ export default function LoanApplyPage() {
     } finally {
       setEligibilityLoading(false);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData.amount, formData.termMonths]);
 
   // ── Final submission ──────────────────────────────────────────────────────

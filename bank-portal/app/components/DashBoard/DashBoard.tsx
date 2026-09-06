@@ -3,6 +3,10 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from '@/i18n';
+import { useAuth } from '@/hooks/useAuth';
+import { roleToKey } from '@/lib/permissions';
+import type { TranslationKey } from '@/i18n';
 import {
   Home,
   ArrowLeftRight,
@@ -112,6 +116,8 @@ const SPARKLINE_DATA_2 = [30, 45, 35, 28, 50, 42, 55, 38, 48, 32, 58, 40, 62, 35
 const SPARKLINE_DATA_3 = [55, 68, 72, 60, 78, 85, 65, 90, 75, 82, 70, 95, 80, 88, 60, 92, 70, 85, 65, 100];
 
 export default function PaymentsDashboard() {
+  const { t } = useTranslation();
+  const { user } = useAuth();
   const [loans, setLoans] = useState<ApiLoan[]>([]);
 
   const loadLoans = useCallback(async () => {
@@ -119,11 +125,11 @@ export default function PaymentsDashboard() {
       const response = await fetch(`${API_URL}/api/loans`);
       if (!response.ok) throw new Error('Unable to load loans');
       const payload = await response.json();
-        const rows = Array.isArray(payload?.data) ? payload.data : [];
-        const uniqueRows = Array.from(
-          new Map<string, ApiLoan>(rows.map((loan: ApiLoan) => [String(loan.id), loan])).values()
-        );
-        setLoans(uniqueRows);
+      const rows = Array.isArray(payload?.data) ? payload.data : [];
+      const uniqueRows = Array.from(
+        new Map<string, ApiLoan>(rows.map((loan: ApiLoan) => [String(loan.id), loan])).values()
+      );
+      setLoans(uniqueRows);
     } catch {
       setLoans([]);
     }
@@ -166,30 +172,31 @@ export default function PaymentsDashboard() {
   const approvedRatio = totalRequested ? approvedBalance / totalRequested : 0;
   const pendingRatio = totalRequested ? pendingBalance / totalRequested : 0;
   const creditScore = Math.round(Math.min(99, Math.max(35, 58 + approvedRatio * 34 - pendingRatio * 12 + Math.min(loans.length, 12))));
-  const creditLevel = creditScore >= 80 ? 'High' : creditScore >= 62 ? 'Medium' : 'Low';
+  const creditLevelRaw = creditScore >= 80 ? 'high' : creditScore >= 62 ? 'medium' : 'low';
+  const creditLevel = t(`dashboard.${creditLevelRaw}` as TranslationKey);
   const creditStyles = {
-    High: {
+    high: {
       text: 'text-emerald-700',
       bg: 'bg-emerald-50',
       border: 'border-emerald-100',
       bar: 'from-emerald-500 to-teal-500',
-      note: 'Strong repayment profile across the current loan book.',
+      note: t('dashboard.strongRepayment'),
     },
-    Medium: {
+    medium: {
       text: 'text-amber-700',
       bg: 'bg-amber-50',
       border: 'border-amber-100',
       bar: 'from-amber-500 to-orange-500',
-      note: 'Balanced portfolio with some applications still pending review.',
+      note: t('dashboard.balancedPortfolio'),
     },
-    Low: {
+    low: {
       text: 'text-rose-700',
       bg: 'bg-rose-50',
       border: 'border-rose-100',
       bar: 'from-rose-500 to-red-500',
-      note: 'Needs attention before expanding the active credit exposure.',
+      note: t('dashboard.needsAttention'),
     },
-  }[creditLevel];
+  }[creditLevelRaw];
 
   const historyData = loans.slice(0, 8).map((loan, index) => ({
     id: loan.id,
@@ -202,10 +209,10 @@ export default function PaymentsDashboard() {
     active: index === 1,
     reference: `LN-${loan.id}`,
     type: 'Loan',
-    date: new Date(loan.created_at).toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric', 
-      year: 'numeric' 
+    date: new Date(loan.created_at).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
     }),
   }));
 
@@ -264,14 +271,14 @@ export default function PaymentsDashboard() {
   return (
     <div className="h-screen w-full max-w-[100vw] bg-slate-50 font-sans overflow-hidden">
       {/* ============ BACKGROUND NOISE & ORBS ============ */}
-      <div 
+      <div
         className="fixed inset-0 pointer-events-none opacity-[0.04] mix-blend-multiply"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
           backgroundSize: '256px 256px',
         }}
       />
-      
+
       {/* Ambient Orbs */}
       <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-400/30 rounded-full blur-[120px] pointer-events-none animate-orb-1" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-emerald-400/20 rounded-full blur-[120px] pointer-events-none animate-orb-2" />
@@ -299,15 +306,13 @@ export default function PaymentsDashboard() {
                   href={item.href}
                   title={item.label}
                   aria-label={item.label}
-                  className={`relative flex items-center transition-all duration-300 ease-out ${
-                    active ? '' : 'hover:translate-x-0.5'
-                  }`}
+                  className={`relative flex items-center transition-all duration-300 ease-out ${active ? '' : 'hover:translate-x-0.5'
+                    }`}
                 >
-                  <div className={`p-2.5 rounded-xl transition-all duration-300 ease-out ${
-                    active 
-                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/30' 
-                      : 'text-slate-500 hover:text-slate-900 hover:bg-white/70'
-                  }`}>
+                  <div className={`p-2.5 rounded-xl transition-all duration-300 ease-out ${active
+                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/30'
+                    : 'text-slate-500 hover:text-slate-900 hover:bg-white/70'
+                    }`}>
                     <Icon className="w-5 h-5" strokeWidth={1.5} />
                   </div>
                   {item.hasNotification && (
@@ -337,8 +342,8 @@ export default function PaymentsDashboard() {
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Dashboard</h1>
-              <p className="text-sm text-slate-500 font-medium">Payments updates</p>
+              <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{t('dashboard.title')}</h1>
+              <p className="text-sm text-slate-500 font-medium">{t('dashboard.paymentsUpdates')}</p>
             </div>
 
             <div className="flex items-center gap-4">
@@ -347,7 +352,7 @@ export default function PaymentsDashboard() {
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
                 <input
                   type="text"
-                  placeholder="Search"
+                  placeholder={t('common.search')}
                   className="pl-11 pr-4 py-2.5 bg-white/70 backdrop-blur-xl border border-white rounded-full text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 w-56 placeholder:text-slate-500 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300"
                 />
               </div>
@@ -363,7 +368,7 @@ export default function PaymentsDashboard() {
                 </button>
                 <div className="flex items-center gap-1.5 cursor-pointer hover:opacity-80 transition-opacity">
                   <div className="w-9 h-9 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center text-white text-xs font-semibold shadow-lg shadow-blue-500/30">
-                    JD
+                    {(user?.name || 'JD').split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)}
                   </div>
                   <ChevronDown className="w-3.5 h-3.5 text-[#9CA3AF]" strokeWidth={2} />
                 </div>
@@ -383,7 +388,7 @@ export default function PaymentsDashboard() {
                   </div>
                   <MoreVertical className="w-4 h-4 text-[#9CA3AF] hover:text-[#6B7280] transition-colors cursor-pointer" strokeWidth={1.5} />
                 </div>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Total Balance</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">{t('dashboard.totalBalance')}</p>
                 <p className="text-4xl font-bold text-slate-900 mt-1 tracking-tight tabular-nums">
                   Rp {totalRequested.toLocaleString("id-ID")}
                 </p>
@@ -400,7 +405,7 @@ export default function PaymentsDashboard() {
                   </div>
                   <MoreVertical className="w-4 h-4 text-[#9CA3AF] hover:text-[#6B7280] transition-colors cursor-pointer" strokeWidth={1.5} />
                 </div>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Pending</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">{t('dashboard.pending')}</p>
                 <p className="text-4xl font-bold text-slate-900 mt-1 tracking-tight tabular-nums">
                   Rp {pendingBalance.toLocaleString("id-ID")}
                 </p>
@@ -417,7 +422,7 @@ export default function PaymentsDashboard() {
                   </div>
                   <MoreVertical className="w-4 h-4 text-[#9CA3AF] hover:text-[#6B7280] transition-colors cursor-pointer" strokeWidth={1.5} />
                 </div>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Approved</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">{t('dashboard.approved')}</p>
                 <p className="text-4xl font-bold text-slate-900 mt-1 tracking-tight tabular-nums">
                   Rp {approvedBalance.toLocaleString("id-ID")}
                 </p>
@@ -429,20 +434,20 @@ export default function PaymentsDashboard() {
           <div className="bg-white/70 backdrop-blur-xl border border-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-3xl p-6 lg:p-8 mb-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_40px_rgb(0,0,0,0.08)]">
             <div className="flex items-center justify-between mb-8">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Balance Overview</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">{t('dashboard.balanceOverview')}</p>
                 <p className="text-3xl font-bold text-slate-900 tracking-tight tabular-nums">
                   Rp {approvedBalance.toLocaleString("id-ID")}
                 </p>
               </div>
               <button className="text-xs font-medium text-[#9CA3AF] bg-[#F8FAFC] px-4 py-1.5 rounded-full hover:bg-[#F1F5F9] transition-colors flex items-center gap-1">
-                PAST 30 DAYS
+                {t('dashboard.past30Days')}
                 <ChevronDown className="w-3 h-3" strokeWidth={2} />
               </button>
             </div>
 
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart 
+                <AreaChart
                   data={chartData}
                   onMouseMove={(state) => {
                     // Crosshair effect handled by recharts
@@ -468,7 +473,7 @@ export default function PaymentsDashboard() {
                     dx={-8}
                     tickFormatter={(value) => {
                       if (value === 0) return '0';
-                      return `${value/1000}K`;
+                      return `${value / 1000}K`;
                     }}
                   />
                   <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#090A0B', strokeWidth: 1, strokeDasharray: '4 4' }} />
@@ -492,8 +497,8 @@ export default function PaymentsDashboard() {
               <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-600 via-emerald-500 to-amber-400" />
               <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Credit Core System</p>
-                  <h2 className="mt-2 text-2xl font-bold text-slate-900 tracking-tight">Portfolio health level</h2>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">{t('dashboard.creditCoreSystem')}</p>
+                  <h2 className="mt-2 text-2xl font-bold text-slate-900 tracking-tight">{t('dashboard.portfolioHealth')}</h2>
                   <p className="mt-2 max-w-xl text-sm font-medium leading-6 text-slate-500">
                     {creditStyles.note}
                   </p>
@@ -506,9 +511,9 @@ export default function PaymentsDashboard() {
 
               <div className="mt-7 grid grid-cols-1 gap-4 md:grid-cols-3">
                 {[
-                  { label: 'Core Score', value: `${creditScore}/100` },
-                  { label: 'Approved Ratio', value: `${Math.round(approvedRatio * 100)}%` },
-                  { label: 'Pending Exposure', value: `Rp ${pendingBalance.toLocaleString("id-ID")}` },
+                  { label: t('dashboard.coreScore'), value: `${creditScore}/100` },
+                  { label: t('dashboard.approvedRatio'), value: `${Math.round(approvedRatio * 100)}%` },
+                  { label: t('dashboard.pendingExposure'), value: `Rp ${pendingBalance.toLocaleString("id-ID")}` },
                 ].map((item) => (
                   <div key={item.label} className="rounded-2xl bg-slate-50/70 border border-white px-4 py-3">
                     <p className="text-xs font-semibold text-slate-500">{item.label}</p>
@@ -524,9 +529,9 @@ export default function PaymentsDashboard() {
                 />
               </div>
               <div className="mt-2 flex justify-between text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                <span>Low</span>
-                <span>Medium</span>
-                <span>High</span>
+                <span>{t('dashboard.low')}</span>
+                <span>{t('dashboard.medium')}</span>
+                <span>{t('dashboard.high')}</span>
               </div>
             </div>
           </section>
@@ -535,17 +540,17 @@ export default function PaymentsDashboard() {
           <div>
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-lg font-bold text-slate-900 tracking-tight">Transaction History</h2>
-                <p className="text-sm text-slate-500 font-medium">Complete transaction history of last 6 months</p>
+                <h2 className="text-lg font-bold text-slate-900 tracking-tight">{t('dashboard.transactionHistory')}</h2>
+                <p className="text-sm text-slate-500 font-medium">{t('dashboard.completeTxHistory')}</p>
               </div>
               <div className="flex items-center gap-3">
                 <Link href="/loans" className="text-sm text-slate-500 hover:text-slate-900 transition-colors flex items-center gap-1.5 px-4 py-2 bg-white/70 backdrop-blur-xl border border-white rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
                   <Filter className="w-3.5 h-3.5" />
-                  Filter
+                  {t('dashboard.filter')}
                 </Link>
                 <button className="text-sm text-slate-500 hover:text-slate-900 transition-colors flex items-center gap-1.5 px-4 py-2 bg-white/70 backdrop-blur-xl border border-white rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
                   <Download className="w-3.5 h-3.5" />
-                  Export
+                  {t('dashboard.export')}
                 </button>
               </div>
             </div>
@@ -556,19 +561,19 @@ export default function PaymentsDashboard() {
                 <table className="w-full text-left border-collapse min-w-[800px]">
                   <thead>
                     <tr className="bg-slate-50/50 border-b border-white text-xs font-semibold text-slate-500 uppercase tracking-widest">
-                      <th className="py-4 px-4 lg:px-6 whitespace-nowrap">ID</th>
-                      <th className="py-4 px-4 lg:px-6 whitespace-nowrap">Applicant</th>
-                      <th className="py-4 px-4 lg:px-6 whitespace-nowrap">Amount</th>
-                      <th className="py-4 px-4 lg:px-6 whitespace-nowrap">Status</th>
-                      <th className="py-4 px-4 lg:px-6 whitespace-nowrap">Date</th>
-                      <th className="py-4 px-4 lg:px-6 text-right whitespace-nowrap">Actions</th>
+                      <th className="py-4 px-4 lg:px-6 whitespace-nowrap">{t('dashboard.id')}</th>
+                      <th className="py-4 px-4 lg:px-6 whitespace-nowrap">{t('dashboard.applicant')}</th>
+                      <th className="py-4 px-4 lg:px-6 whitespace-nowrap">{t('dashboard.amount')}</th>
+                      <th className="py-4 px-4 lg:px-6 whitespace-nowrap">{t('dashboard.status')}</th>
+                      <th className="py-4 px-4 lg:px-6 whitespace-nowrap">{t('dashboard.date')}</th>
+                      <th className="py-4 px-4 lg:px-6 text-right whitespace-nowrap">{t('dashboard.actions')}</th>
                     </tr>
                   </thead>
                   <tbody className="text-sm divide-y divide-gray-100/50">
                     {historyData.map((item) => {
                       const statusStyles = getStatusStyles(item.status);
                       return (
-                        <tr 
+                        <tr
                           key={item.id}
                           className="hover:bg-gray-50/50 transition-colors duration-150 cursor-pointer group focus:bg-gray-50/50 focus:outline-none"
                         >
@@ -612,7 +617,7 @@ export default function PaymentsDashboard() {
                               <Link
                                 href={`/loans/${item.id}`}
                                 className="p-2 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all duration-200 hover:scale-105"
-                                title="View loan"
+                                title={t('dashboard.viewLoan')}
                               >
                                 <Eye className="h-4 w-4" strokeWidth={1.5} />
                               </Link>
@@ -641,9 +646,9 @@ export default function PaymentsDashboard() {
 
               {historyData.length === 0 && (
                 <div className="text-center py-16">
-                  <p className="text-lg font-medium text-slate-600">No transactions found</p>
+                  <p className="text-lg font-medium text-slate-600">{t('dashboard.noTransactions')}</p>
                   <p className="text-sm text-gray-400 mt-1">
-                    Try adjusting your search or filters
+                    {t('dashboard.tryAdjusting')}
                   </p>
                 </div>
               )}
@@ -651,7 +656,7 @@ export default function PaymentsDashboard() {
               {/* View All Link */}
               <div className="px-4 lg:px-6 py-4 border-t border-gray-100/50 text-center">
                 <Link href="/transactions" className="text-sm text-slate-500 hover:text-slate-900 transition-colors font-medium">
-                  View All Transactions
+                  {t('dashboard.viewAllTransactions')}
                 </Link>
               </div>
             </div>
@@ -663,8 +668,8 @@ export default function PaymentsDashboard() {
           <div className="rounded-3xl border border-white bg-white/70 p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] backdrop-blur-xl">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Core Monitor</p>
-                <h3 className="mt-1 text-lg font-bold tracking-tight text-slate-900">Credit distribution</h3>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">{t('dashboard.coreMonitor')}</p>
+                <h3 className="mt-1 text-lg font-bold tracking-tight text-slate-900">{t('dashboard.creditDistribution')}</h3>
               </div>
               <div className={`rounded-xl ${creditStyles.bg} ${creditStyles.text} px-3 py-2 text-sm font-bold`}>
                 {creditScore}
@@ -673,9 +678,9 @@ export default function PaymentsDashboard() {
 
             <div className="mt-6 space-y-4">
               {[
-                { label: 'Approved', value: approvedBalance, color: 'bg-emerald-500' },
-                { label: 'Pending', value: pendingBalance, color: 'bg-amber-500' },
-                { label: 'Total', value: totalRequested, color: 'bg-blue-500' },
+                { label: t('dashboard.approved'), value: approvedBalance, color: 'bg-emerald-500' },
+                { label: t('dashboard.pending'), value: pendingBalance, color: 'bg-amber-500' },
+                { label: t('dashboard.total'), value: totalRequested, color: 'bg-blue-500' },
               ].map((item) => {
                 const width = totalRequested ? Math.max(6, Math.round((item.value / totalRequested) * 100)) : 0;
                 return (
@@ -696,7 +701,7 @@ export default function PaymentsDashboard() {
               href="/loans/apply"
               className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/30 transition-all hover:shadow-blue-500/50"
             >
-              Start Application
+              {t('dashboard.startApplication')}
               <ArrowUpRight className="h-4 w-4" />
             </Link>
           </div>

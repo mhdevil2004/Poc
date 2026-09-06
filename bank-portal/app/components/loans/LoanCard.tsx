@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { formatCurrency, formatDate, formatPercentage } from "@/lib/utils/formatters";
+import { useTranslation } from "@/i18n";
 import type { Loan } from "@/types";
 
 interface LoanCardProps {
@@ -15,6 +16,8 @@ interface LoanCardProps {
 }
 
 export function LoanCard({ loan, onApprove, onReject, onDelete, loading }: LoanCardProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="space-y-6">
       <Card>
@@ -24,10 +27,10 @@ export function LoanCard({ loan, onApprove, onReject, onDelete, loading }: LoanC
               <CardTitle className="text-2xl">{loan.id}</CardTitle>
               <Badge status={loan.status} />
             </div>
-            <p className="text-gray-500">{loan.purpose || "No purpose specified"}</p>
+            <p className="text-gray-500">{loan.purpose || t('loanCard.noPurpose')}</p>
           </div>
           <Link href="/loans">
-            <Button variant="outline" size="sm">Back to Loans</Button>
+            <Button variant="outline" size="sm">{t('loanCard.backToLoans')}</Button>
           </Link>
         </CardHeader>
 
@@ -38,7 +41,7 @@ export function LoanCard({ loan, onApprove, onReject, onDelete, loading }: LoanC
                 <User className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Applicant</p>
+                <p className="text-sm text-gray-500">{t('loanCard.applicant')}</p>
                 <p className="font-medium text-gray-900">{loan.applicantName}</p>
               </div>
             </div>
@@ -48,7 +51,7 @@ export function LoanCard({ loan, onApprove, onReject, onDelete, loading }: LoanC
                 <Mail className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Email</p>
+                <p className="text-sm text-gray-500">{t('loanCard.email')}</p>
                 <p className="font-medium text-gray-900">{loan.applicantEmail}</p>
               </div>
             </div>
@@ -58,7 +61,7 @@ export function LoanCard({ loan, onApprove, onReject, onDelete, loading }: LoanC
                 <DollarSign className="h-5 w-5 text-secondary" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Amount</p>
+                <p className="text-sm text-gray-500">{t('loanCard.amount')}</p>
                 <p className="font-medium text-gray-900 text-lg">{formatCurrency(loan.amount)}</p>
               </div>
             </div>
@@ -68,8 +71,8 @@ export function LoanCard({ loan, onApprove, onReject, onDelete, loading }: LoanC
                 <Calendar className="h-5 w-5 text-success" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Term</p>
-                <p className="font-medium text-gray-900">{loan.termMonths} months</p>
+                <p className="text-sm text-gray-500">{t('loanCard.term')}</p>
+                <p className="font-medium text-gray-900">{loan.termMonths} {t('loanCard.months')}</p>
               </div>
             </div>
 
@@ -79,7 +82,7 @@ export function LoanCard({ loan, onApprove, onReject, onDelete, loading }: LoanC
                   <DollarSign className="h-5 w-5 text-warning" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Interest Rate</p>
+                  <p className="text-sm text-gray-500">{t('loanCard.interestRate')}</p>
                   <p className="font-medium text-gray-900">{formatPercentage(loan.interestRate)}</p>
                 </div>
               </div>
@@ -91,7 +94,7 @@ export function LoanCard({ loan, onApprove, onReject, onDelete, loading }: LoanC
                   <DollarSign className="h-5 w-5 text-[#334155]" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Monthly payment</p>
+                  <p className="text-sm text-gray-500">{t('loanCard.monthlyPayment')}</p>
                   <p className="font-medium text-gray-900">{formatCurrency(loan.monthlyPayment)}</p>
                 </div>
               </div>
@@ -102,7 +105,7 @@ export function LoanCard({ loan, onApprove, onReject, onDelete, loading }: LoanC
                 <Calendar className="h-5 w-5 text-gray-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Created</p>
+                <p className="text-sm text-gray-500">{t('loanCard.created')}</p>
                 <p className="font-medium text-gray-900">{formatDate(loan.createdAt)}</p>
               </div>
             </div>
@@ -113,29 +116,29 @@ export function LoanCard({ loan, onApprove, onReject, onDelete, loading }: LoanC
       {(loan.status === "pending" || onDelete) && (
         <Card>
           <CardHeader>
-            <CardTitle>Actions</CardTitle>
+            <CardTitle>{t('loanCard.actions')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap items-center gap-3">
               <Link href={`/loans/${loan.id}/edit`}>
                 <Button variant="outline">
                   <Edit className="h-4 w-4" />
-                  Edit Loan
+                  {t('loanCard.editLoan')}
                 </Button>
               </Link>
               {loan.status === "pending" && onApprove && (
                 <Button variant="success" onClick={onApprove} loading={loading}>
-                  Approve Loan
+                  {t('loanCard.approveLoan')}
                 </Button>
               )}
               {loan.status === "pending" && onReject && (
                 <Button variant="danger" onClick={onReject} loading={loading}>
-                  Reject Loan
+                  {t('loanCard.rejectLoan')}
                 </Button>
               )}
               {onDelete && (
                 <Button variant="outline" onClick={onDelete} loading={loading} className="text-danger border-danger hover:bg-danger/5">
-                  Delete Loan
+                  {t('loanCard.deleteLoan')}
                 </Button>
               )}
             </div>

@@ -8,9 +8,11 @@ import { LoanFilters } from "@/components/loans/LoanFilters";
 import { LoanTable } from "@/components/loans/LoanTable";
 import { Button } from "@/components/ui/Button";
 import { useLoans } from "@/hooks/useLoans";
+import { useTranslation } from "@/i18n";
 import type { LoanStatus } from "@/types";
 
 export default function LoansPage() {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<LoanStatus | "all">("all");
   const [page, setPage] = useState(1);
@@ -30,24 +32,24 @@ export default function LoansPage() {
   }, [applyFilters]);
 
   const handleDelete = async (id: string) => {
-    if (window.confirm("Are you sure you want to delete this loan?")) {
+    if (window.confirm(t('loans.confirmDelete'))) {
       await remove(id);
     }
   };
 
   return (
-    <DashboardLayout title="All Loans" subtitle="Manage and track all loan applications">
+    <DashboardLayout title={t('loans.title')} subtitle={t('loans.manageLoans')}>
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <p className="text-[#9CA3AF]">
-              Live data from the loan API
+              {t('loans.liveData')}
             </p>
           </div>
           <Link href="/loans/create">
             <Button>
               <Plus className="h-4 w-4" />
-              New Application
+              {t('loans.newApplication')}
             </Button>
           </Link>
         </div>
@@ -64,6 +66,7 @@ export default function LoansPage() {
             setPage(1);
           }}
         />
+        
 
         <LoanTable
           loans={loans}

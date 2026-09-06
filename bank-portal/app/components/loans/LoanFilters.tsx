@@ -1,6 +1,7 @@
 "use client";
 
 import { Search, ChevronDown } from "lucide-react";
+import { useTranslation } from "@/i18n";
 import type { LoanStatus } from "@/types";
 
 interface LoanFiltersProps {
@@ -10,27 +11,29 @@ interface LoanFiltersProps {
   onStatusChange: (value: LoanStatus | "all") => void;
 }
 
-const statusOptions: { value: LoanStatus | "all"; label: string }[] = [
-  { value: "all", label: "All Statuses" },
-  { value: "pending", label: "Pending" },
-  { value: "approved", label: "Approved" },
-  { value: "active", label: "Active" },
-  { value: "rejected", label: "Rejected" },
-  { value: "defaulted", label: "Defaulted" },
-  { value: "closed", label: "Closed" },
-  { value: "completed", label: "Completed" },
-];
-
 export function LoanFilters({
   search,
   status,
   onSearchChange,
   onStatusChange,
 }: LoanFiltersProps) {
+  const { t } = useTranslation();
+
+  const statusOptions: { value: LoanStatus | "all"; label: string }[] = [
+    { value: "all", label: t('loans.allStatuses') },
+    { value: "pending", label: t('loans.pending') },
+    { value: "approved", label: t('loans.approved') },
+    { value: "active", label: t('loans.active') },
+    { value: "rejected", label: t('loans.rejected') },
+    { value: "defaulted", label: t('loans.defaulted') },
+    { value: "closed", label: t('loans.closed') },
+    { value: "completed", label: t('loans.completed') },
+  ];
+
   // Get the label for the current status
   const getStatusLabel = (value: LoanStatus | "all") => {
     const option = statusOptions.find((opt) => opt.value === value);
-    return option?.label || "All Statuses";
+    return option?.label || t('loans.allStatuses');
   };
 
   return (
@@ -42,7 +45,7 @@ export function LoanFilters({
         </div>
         <input
           type="text"
-          placeholder="Search by name, email, or ID..."
+          placeholder={t('loans.searchPlaceholder')}
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
           className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200/80 hover:border-gray-300 focus:border-black focus:ring-2 focus:ring-black/5 rounded-xl text-sm text-gray-900 placeholder:text-gray-400 transition-all duration-200 outline-none shadow-[0_1px_2px_rgba(0,0,0,0.02)]"

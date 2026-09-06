@@ -1,9 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { Header } from "./Header";
 import { Sidebar } from "./Sidebar";
 import { RightPanel } from "./RightPanel";
+import { AccessDenied } from "@/components/AccessDenied";
+import { useAuth } from "@/hooks/useAuth";
+import { hasAccess } from "@/lib/permissions";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -19,6 +23,22 @@ export function DashboardLayout({
   showRightPanel = false,
 }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { user, loading } = useAuth();
+  const pathname = usePathname();
+
+  // Wait for auth to hydrate before checking permissions
+  if (loading) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center bg-slate-50">
+        <div className="animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  // Route-level access check
+  if (user && !hasAccess(user.role, pathname)) {
+    return <AccessDenied />;
+  }
 
   return (
     <div className="relative h-screen w-full max-w-[100vw] overflow-hidden bg-slate-50 font-sans">

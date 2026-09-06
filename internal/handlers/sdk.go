@@ -16,8 +16,8 @@ import (
 
 const (
 	sdkTokenTTL = 5 * time.Minute
-	sdkIssuer   = "fintilla-loan-api"
-	sdkAudience = "fintilla-premium-sdk"
+	sdkIssuer   = "Fintillaa-loan-api"
+	sdkAudience = "Fintillaa-premium-sdk"
 )
 
 type SDKHandler struct {
@@ -56,7 +56,7 @@ func SDKSecretFromEnv() string {
 	if secret := strings.TrimSpace(os.Getenv("JWT_SECRET")); secret != "" {
 		return secret
 	}
-	return "fintilla-local-dev-secret-change-before-production-2026"
+	return "Fintillaa-local-dev-secret-change-before-production-2026"
 }
 
 func (h *SDKHandler) Handshake(w http.ResponseWriter, r *http.Request) {

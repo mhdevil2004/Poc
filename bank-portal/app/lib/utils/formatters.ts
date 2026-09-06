@@ -6,12 +6,16 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatCurrency(amount: number): string {
-  return `Rp ${new Intl.NumberFormat("id-ID", {
-    minimumFractionDigits: 0,
+export function formatIDR(amount: number): string {
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
     maximumFractionDigits: 0,
-  }).format(amount)}`;
+  }).format(amount);
 }
+
+// Alias for backward compat with customer-facing pages
+export const formatCurrency = formatIDR;
 
 export function formatDate(date: string | Date): string {
   return new Intl.DateTimeFormat("en-US", {

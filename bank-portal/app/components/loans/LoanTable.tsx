@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { formatCurrency, formatDate } from "@/lib/utils/formatters";
+import { useTranslation } from "@/i18n";
+import type { TranslationKey } from "@/i18n";
 import type { Loan } from "@/types";
 
 interface LoanTableProps {
@@ -26,6 +28,7 @@ export function LoanTable({
   onDelete,
 }: LoanTableProps) {
   const router = useRouter();
+  const { t } = useTranslation();
 
   // Get initials from name
   const getInitials = (name: string) => {
@@ -100,12 +103,12 @@ export function LoanTable({
           <table className="w-full text-left border-collapse min-w-[800px]">
             <thead>
               <tr className="bg-gray-50/50 border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase tracking-widest">
-                <th className="py-4 px-4 lg:px-6 whitespace-nowrap">ID</th>
-                <th className="py-4 px-4 lg:px-6 whitespace-nowrap">Applicant</th>
-                <th className="py-4 px-4 lg:px-6 whitespace-nowrap">Amount</th>
-                <th className="py-4 px-4 lg:px-6 whitespace-nowrap">Status</th>
-                <th className="py-4 px-4 lg:px-6 whitespace-nowrap">Date</th>
-                <th className="py-4 px-4 lg:px-6 text-right whitespace-nowrap">Actions</th>
+                <th className="py-4 px-4 lg:px-6 whitespace-nowrap">{t('loans.id')}</th>
+                <th className="py-4 px-4 lg:px-6 whitespace-nowrap">{t('loans.applicant')}</th>
+                <th className="py-4 px-4 lg:px-6 whitespace-nowrap">{t('loans.amount')}</th>
+                <th className="py-4 px-4 lg:px-6 whitespace-nowrap">{t('loans.status')}</th>
+                <th className="py-4 px-4 lg:px-6 whitespace-nowrap">{t('loans.date')}</th>
+                <th className="py-4 px-4 lg:px-6 text-right whitespace-nowrap">{t('loans.actions')}</th>
               </tr>
             </thead>
             <tbody className="text-sm divide-y divide-gray-100">
@@ -154,7 +157,7 @@ export function LoanTable({
                         <span
                           className={`w-1.5 h-1.5 rounded-full ${statusStyles.dot}`}
                         />
-                        {loan.status}
+                        {t(`loans.${loan.status.toLowerCase()}` as TranslationKey) || loan.status}
                       </span>
                     </td>
                     <td className="py-4 px-4 lg:px-6 text-gray-500 font-medium whitespace-nowrap">
@@ -168,8 +171,8 @@ export function LoanTable({
                       <div className="flex items-center justify-end gap-1">
                         <button
                           type="button"
-                          title="View loan"
-                          aria-label={`View loan ${loan.id}`}
+                          title={t('loans.view')}
+                          aria-label={`${t('loans.view')} ${loan.id}`}
                           onClick={() => router.push(`/loans/${loan.id}`)}
                           className="p-2 text-gray-400 hover:text-black hover:bg-gray-100 rounded-lg transition-all duration-200 hover:scale-105"
                         >
@@ -177,8 +180,8 @@ export function LoanTable({
                         </button>
                         <button
                           type="button"
-                          title="Edit loan"
-                          aria-label={`Edit loan ${loan.id}`}
+                          title={t('loans.edit')}
+                          aria-label={`${t('loans.edit')} ${loan.id}`}
                           onClick={() => router.push(`/loans/${loan.id}/edit`)}
                           className="p-2 text-gray-400 hover:text-black hover:bg-gray-100 rounded-lg transition-all duration-200 hover:scale-105"
                         >
@@ -187,8 +190,8 @@ export function LoanTable({
                         {onDelete && (
                           <button
                             type="button"
-                            title="Delete loan"
-                            aria-label={`Delete loan ${loan.id}`}
+                            title={t('loans.delete')}
+                            aria-label={`${t('loans.delete')} ${loan.id}`}
                             onClick={() => onDelete(loan.id)}
                             className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-105"
                           >
@@ -206,9 +209,9 @@ export function LoanTable({
 
         {loans.length === 0 && (
           <div className="text-center py-16">
-            <p className="text-lg font-medium text-gray-600">No loans found</p>
+            <p className="text-lg font-medium text-gray-600">{t('loans.noLoans')}</p>
             <p className="text-sm text-gray-400 mt-1">
-              Try adjusting your search or filters
+              {t('loans.tryAdjusting')}
             </p>
           </div>
         )}
@@ -216,7 +219,7 @@ export function LoanTable({
         {totalPages > 1 && (
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 lg:px-6 py-4 border-t border-gray-100">
             <p className="text-sm text-gray-500">
-              Page {page} of {totalPages}
+              {t('loans.pageOf', { page: String(page), total: String(totalPages) })}
             </p>
             <div className="flex items-center gap-2">
               <button
@@ -225,14 +228,14 @@ export function LoanTable({
                 className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:text-black transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white"
               >
                 <ChevronLeft className="h-4 w-4" strokeWidth={1.5} />
-                Previous
+                {t('loans.previous')}
               </button>
               <button
                 onClick={() => onPageChange(page + 1)}
                 disabled={page >= totalPages}
                 className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:text-black transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white"
               >
-                Next
+                {t('loans.next')}
                 <ChevronRight className="h-4 w-4" strokeWidth={1.5} />
               </button>
             </div>

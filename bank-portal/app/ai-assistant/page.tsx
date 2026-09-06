@@ -154,15 +154,15 @@ export default function AIAssistantPage() {
   // Handle SDK Context injection
   useEffect(() => {
     const initSdkFlow = async () => {
-      const token = sessionStorage.getItem("fintilla_sdk_token");
+      const token = sessionStorage.getItem("Fintilla_sdk_token");
       if (!token) return;
-      sessionStorage.removeItem("fintilla_sdk_token"); // Consume once
+      sessionStorage.removeItem("Fintilla_sdk_token"); // Consume once
 
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
         const res = await fetch(`${apiUrl}/api/v1/sdk/verify?token=${encodeURIComponent(token)}`);
         const data = await res.json();
-        
+
         if (res.ok && data.user) {
           const contextMsg = `Create this partner loan application. Context: ${JSON.stringify({
             applicant_name: data.user.name,
@@ -179,14 +179,14 @@ export default function AIAssistantPage() {
     initSdkFlow();
   }, [sendMessage]);
 
-  // Handle FINTILLA_SUCCESS postMessage
+  // Handle Fintilla_SUCCESS postMessage
   useEffect(() => {
     const lastMsg = messages[messages.length - 1];
     if (lastMsg && !lastMsg.loading && lastMsg.role === "assistant" && lastMsg.toolUsed === "create_loan_application") {
       const data: any = lastMsg.data;
       if (data && data.success) {
         if (window.parent && window.parent !== window) {
-          window.parent.postMessage({ type: "FINTILLA_SUCCESS" }, "*");
+          window.parent.postMessage({ type: "Fintilla_SUCCESS" }, "*");
         }
       }
     }
@@ -275,8 +275,8 @@ export default function AIAssistantPage() {
                       msg.role === "user"
                         ? "bg-[#090A0B] text-white rounded-tr-sm"
                         : msg.error
-                        ? "bg-red-50 text-red-700 border border-red-100 rounded-tl-sm"
-                        : "bg-[#F7F9FC] text-[#374151] rounded-tl-sm"
+                          ? "bg-red-50 text-red-700 border border-red-100 rounded-tl-sm"
+                          : "bg-[#F7F9FC] text-[#374151] rounded-tl-sm"
                     )}
                   >
                     {msg.loading ? (

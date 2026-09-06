@@ -15,10 +15,14 @@ import {
   type ChangePasswordFormData,
   type ProfileFormData,
 } from "@/lib/validations/loanSchema";
+import { useTranslation } from "@/i18n";
+import type { TranslationKey } from "@/i18n";
+import { roleToKey } from "@/lib/permissions";
 import type { NotificationPreferences } from "@/types";
 
 export default function SettingsPage() {
   const { user, updateUser } = useAuth();
+  const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const [notifications, setNotifications] = useState<NotificationPreferences>({
     emailNotifications: true,
@@ -55,7 +59,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <DashboardLayout title="Settings" subtitle="Manage your account">
+    <DashboardLayout title={t('settings.title')} subtitle={t('settings.manageAccount')}>
       <div className="max-w-3xl space-y-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
@@ -64,13 +68,13 @@ export default function SettingsPage() {
                 <User className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <CardTitle>Profile Information</CardTitle>
-                <p className="text-sm text-gray-500 mt-1">Manage your account details</p>
+                <CardTitle>{t('settings.profileInformation')}</CardTitle>
+                <p className="text-sm text-gray-500 mt-1">{t('settings.manageDetails')}</p>
               </div>
             </div>
             {!isEditing && (
               <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
-                Edit Profile
+                {t('settings.editProfile')}
               </Button>
             )}
           </CardHeader>
@@ -79,23 +83,23 @@ export default function SettingsPage() {
             {!isEditing ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <p className="text-sm text-gray-500">Full Name</p>
+                  <p className="text-sm text-gray-500">{t('settings.fullName')}</p>
                   <p className="font-medium text-gray-900 mt-1">{user?.name}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Email</p>
+                  <p className="text-sm text-gray-500">{t('settings.email')}</p>
                   <p className="font-medium text-gray-900 mt-1">{user?.email}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Role</p>
-                  <p className="font-medium text-gray-900 mt-1 capitalize">{user?.role}</p>
+                  <p className="text-sm text-gray-500">{t('settings.role')}</p>
+                  <p className="font-medium text-gray-900 mt-1 capitalize">{user?.role ? t(`roles.${roleToKey(user.role)}` as TranslationKey) : ""}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Department</p>
+                  <p className="text-sm text-gray-500">{t('settings.department')}</p>
                   <p className="font-medium text-gray-900 mt-1">{user?.department || "—"}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Phone</p>
+                  <p className="text-sm text-gray-500">{t('settings.phone')}</p>
                   <p className="font-medium text-gray-900 mt-1">{user?.phone || "—"}</p>
                 </div>
               </div>
@@ -103,29 +107,29 @@ export default function SettingsPage() {
               <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Input
-                    label="Full Name"
+                    label={t('settings.fullName')}
                     error={profileForm.formState.errors.name?.message}
                     {...profileForm.register("name")}
                   />
                   <Input
-                    label="Email"
+                    label={t('settings.email')}
                     type="email"
                     error={profileForm.formState.errors.email?.message}
                     {...profileForm.register("email")}
                   />
                   <Input
-                    label="Phone"
+                    label={t('settings.phone')}
                     {...profileForm.register("phone")}
                   />
                   <Input
-                    label="Department"
+                    label={t('settings.department')}
                     {...profileForm.register("department")}
                   />
                 </div>
                 <div className="flex gap-3">
-                  <Button type="submit">Save Changes</Button>
+                  <Button type="submit">{t('settings.saveChanges')}</Button>
                   <Button type="button" variant="outline" onClick={() => setIsEditing(false)}>
-                    Cancel
+                    {t('settings.cancel')}
                   </Button>
                 </div>
               </form>
@@ -140,8 +144,8 @@ export default function SettingsPage() {
                 <Key className="h-5 w-5 text-secondary" />
               </div>
               <div>
-                <CardTitle>Change Password</CardTitle>
-                <p className="text-sm text-gray-500 mt-1">Update your account password</p>
+                <CardTitle>{t('settings.changePassword')}</CardTitle>
+                <p className="text-sm text-gray-500 mt-1">{t('settings.updatePasswordDesc')}</p>
               </div>
             </div>
           </CardHeader>
@@ -149,24 +153,24 @@ export default function SettingsPage() {
           <CardContent>
             <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)} className="space-y-4 max-w-md">
               <Input
-                label="Current Password"
+                label={t('settings.currentPassword')}
                 type="password"
                 error={passwordForm.formState.errors.currentPassword?.message}
                 {...passwordForm.register("currentPassword")}
               />
               <Input
-                label="New Password"
+                label={t('settings.newPassword')}
                 type="password"
                 error={passwordForm.formState.errors.newPassword?.message}
                 {...passwordForm.register("newPassword")}
               />
               <Input
-                label="Confirm New Password"
+                label={t('settings.confirmNewPassword')}
                 type="password"
                 error={passwordForm.formState.errors.confirmPassword?.message}
                 {...passwordForm.register("confirmPassword")}
               />
-              <Button type="submit">Update Password</Button>
+              <Button type="submit">{t('settings.updatePassword')}</Button>
             </form>
           </CardContent>
         </Card>
@@ -178,8 +182,8 @@ export default function SettingsPage() {
                 <Bell className="h-5 w-5 text-success" />
               </div>
               <div>
-                <CardTitle>Notification Preferences</CardTitle>
-                <p className="text-sm text-gray-500 mt-1">Manage how you receive notifications</p>
+                <CardTitle>{t('settings.notificationPreferences')}</CardTitle>
+                <p className="text-sm text-gray-500 mt-1">{t('settings.manageNotifications')}</p>
               </div>
             </div>
           </CardHeader>
@@ -188,10 +192,10 @@ export default function SettingsPage() {
             <div className="space-y-4">
               {(
                 [
-                  { key: "emailNotifications", label: "Email Notifications", desc: "Receive general email updates" },
-                  { key: "loanUpdates", label: "Loan Updates", desc: "Get notified about loan status changes" },
-                  { key: "marketingEmails", label: "Marketing Emails", desc: "Receive promotional offers and news" },
-                  { key: "securityAlerts", label: "Security Alerts", desc: "Important security and login notifications" },
+                  { key: "emailNotifications", label: t('settings.emailNotifications'), desc: t('settings.emailNotificationsDesc') },
+                  { key: "loanUpdates", label: t('settings.loanUpdates'), desc: t('settings.loanUpdatesDesc') },
+                  { key: "marketingEmails", label: t('settings.marketingEmails'), desc: t('settings.marketingEmailsDesc') },
+                  { key: "securityAlerts", label: t('settings.securityAlerts'), desc: t('settings.securityAlertsDesc') },
                 ] as const
               ).map((item) => (
                 <div

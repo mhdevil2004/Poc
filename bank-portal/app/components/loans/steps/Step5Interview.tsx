@@ -3,9 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { Loader2, Camera, Mic, MapPin, CheckCircle2 } from "lucide-react";
 import { UIGuideOverlay } from "@/components/interview/UIGuideOverlay";
-import { 
-  startInterview, 
-  submitInterviewAnswer, 
+import {
+  startInterview,
+  submitInterviewAnswer,
   submitInterviewPermission,
   type InterviewResponse
 } from "@/lib/api/interviewService";
@@ -19,8 +19,8 @@ export function Step5Interview({ onComplete }: { onComplete: () => void }) {
   useEffect(() => {
     if (initialized.current) return;
     initialized.current = true;
-    
-    startInterview("FINTILLA_SDK_PARTNER")
+
+    startInterview("Fintilla_SDK_PARTNER")
       .then(res => {
         setState(res);
         setLoading(false);
@@ -61,7 +61,7 @@ export function Step5Interview({ onComplete }: { onComplete: () => void }) {
     if (state.action === "request_camera_permission") permType = "camera";
     else if (state.action === "request_microphone_permission") permType = "microphone";
     else if (state.action === "request_location_permission") permType = "location";
-    
+
     try {
       const nextState = await submitInterviewPermission(state.session_id, permType, granted ? "granted" : "denied");
       setState(nextState);
@@ -90,8 +90,8 @@ export function Step5Interview({ onComplete }: { onComplete: () => void }) {
 
       {/* Progress Bar (Interview specific progress) */}
       <div className="w-full bg-white rounded-full h-2 mb-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-        <div 
-          className="bg-gradient-to-r from-blue-600 to-indigo-600 h-2 rounded-full transition-all duration-500" 
+        <div
+          className="bg-gradient-to-r from-blue-600 to-indigo-600 h-2 rounded-full transition-all duration-500"
           style={{ width: `${(state.progress.current / state.progress.total) * 100}%` }}
         />
       </div>
@@ -122,11 +122,11 @@ function MessageView({ state, onAnswer, onComplete }: { state: InterviewResponse
   return (
     <div className="bg-white/70 backdrop-blur-xl p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white text-center space-y-6">
       <h2 className="text-2xl font-bold text-slate-900 tracking-tight">{state.message}</h2>
-      
+
       {state.question && (
         <div className="mt-8 space-y-4">
           <p className="text-lg text-slate-600 font-medium">{state.question.text}</p>
-          
+
           {state.question.input_type === "choice" && (
             <div className="flex flex-col gap-3 max-w-sm mx-auto">
               {state.question.options?.map(opt => (
@@ -142,7 +142,7 @@ function MessageView({ state, onAnswer, onComplete }: { state: InterviewResponse
           )}
         </div>
       )}
-      
+
       {state.action === "completed" && (
         <div className="mt-8">
           <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-4" />
@@ -210,7 +210,7 @@ function TipsView({ state, onAnswer }: { state: InterviewResponse, onAnswer: (an
           </li>
         ))}
       </ul>
-      
+
       {state.question && (
         <div className="text-center border-t pt-8">
           <p className="text-lg font-bold mb-4">{state.question.text}</p>
@@ -251,7 +251,7 @@ function VideoInitView({ state, onAnswer }: { state: InterviewResponse, onAnswer
     <div className="bg-slate-950 p-4 rounded-3xl shadow-[0_8px_40px_rgb(0,0,0,0.18)] overflow-hidden relative border border-slate-800">
       <video ref={videoRef} autoPlay muted playsInline className="w-full h-[500px] object-cover rounded-2xl bg-slate-900" />
       <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent pointer-events-none" />
-      
+
       <div className="absolute bottom-8 left-0 right-0 text-center px-8 z-10">
         <h2 className="text-2xl font-bold text-white mb-6 drop-shadow-md">{state.message}</h2>
         <button
@@ -284,7 +284,7 @@ function VideoQuestionView({ state, onAnswer }: { state: InterviewResponse, onAn
         streamRef.current = s;
         if (videoRef.current) videoRef.current.srcObject = s;
       });
-      
+
     return () => {
       mounted = false;
       streamRef.current?.getTracks().forEach(t => t.stop());
@@ -301,7 +301,7 @@ function VideoQuestionView({ state, onAnswer }: { state: InterviewResponse, onAn
           REC
         </div>
       </div>
-      
+
       {/* Question Side */}
       <div className="md:w-1/2 p-8 flex flex-col justify-center">
         <div className="mb-8">
@@ -310,7 +310,7 @@ function VideoQuestionView({ state, onAnswer }: { state: InterviewResponse, onAn
             {state.question?.text}
           </h2>
         </div>
-        
+
         {/* Mock Transcription / Text Input for POC */}
         <div className="space-y-4">
           <label className="text-sm text-slate-500 font-medium flex items-center gap-2">

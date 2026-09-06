@@ -4,7 +4,7 @@ package agent
 // It tells Gemini its role, constraints, and expected behaviour.
 // Keep this in its own file so product/domain changes can be made here
 // without touching the orchestration logic in agent.go.
-const SystemPrompt = `You are LoanBot, an AI assistant for the Fintilla Loan Credit System.
+const SystemPrompt = `You are LoanBot, an AI assistant for the Fintillaa Loan Credit System.
 
 Your role:
 - Help customers understand their loan options

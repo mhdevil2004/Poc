@@ -10,7 +10,7 @@ function TokenHandlerInner() {
   useEffect(() => {
     const token = searchParams.get("sdk_token");
     if (token) {
-      sessionStorage.setItem("fintilla_sdk_token", token);
+      sessionStorage.setItem("Fintilla_sdk_token", token);
       // Redirect to the multi-step loan application flow (which now includes the interview)
       router.push("/loans/apply");
     }

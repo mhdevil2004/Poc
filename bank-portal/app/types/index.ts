@@ -7,7 +7,16 @@ export type LoanStatus =
   | "closed"
   | "completed";
 
-export type UserRole = "admin" | "manager" | "officer";
+export type UserRole =
+  | "admin"
+  | "manager"
+  | "officer"
+  | "administrator"
+  | "loan_manager"
+  | "risk_analyst"
+  | "branch_manager"
+  | "operations_officer"
+  | "read_only_auditor";
 
 export interface User {
   id: string;

@@ -70,7 +70,7 @@ export function SignupForm() {
     // MAIN WRAPPER WITH 3-LAYER DEPTH SYSTEM
     // ============================================
     <div className="relative h-screen w-full flex items-center justify-center bg-[#FAFAFA] overflow-hidden p-4">
-      
+
       {/* ============================================ */}
       {/* LAYER 1: AMBIENT BLURRED ORBS */}
       {/* ============================================ */}
@@ -81,7 +81,7 @@ export function SignupForm() {
       {/* ============================================ */}
       {/* LAYER 2: HIGH-END TECHNICAL GRID WITH RADIAL FADE */}
       {/* ============================================ */}
-      <div 
+      <div
         className="absolute inset-0 pointer-events-none"
         style={{
           backgroundImage: `
@@ -99,10 +99,10 @@ export function SignupForm() {
       {/* ============================================ */}
       <div className="relative z-10 w-full max-w-[1000px] h-[620px] p-4">
         <div className="bg-white/80 backdrop-blur-xl border border-white/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-[2rem] lg:rounded-[3rem] overflow-hidden flex flex-col lg:flex-row h-full">
-          
+
           {/* Inner Glass Reflection */}
           <div className="absolute inset-0 pointer-events-none bg-gradient-to-br from-white/40 to-transparent rounded-[2rem] lg:rounded-[3rem]" />
-          
+
           {/* ============ LEFT COLUMN: Create Account Form ============ */}
           <div className="w-full lg:w-1/2 flex flex-col justify-center p-8 sm:p-10 lg:p-12">
             {/* Header */}
@@ -118,7 +118,7 @@ export function SignupForm() {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-3.5">
               {/* Full Name */}
               <div className="space-y-1">
-                <label 
+                <label
                   htmlFor="name"
                   className="text-[10px] font-semibold text-[#6B7280] tracking-[0.1em] uppercase"
                 >
@@ -140,7 +140,7 @@ export function SignupForm() {
 
               {/* Email */}
               <div className="space-y-1">
-                <label 
+                <label
                   htmlFor="email"
                   className="text-[10px] font-semibold text-[#6B7280] tracking-[0.1em] uppercase"
                 >
@@ -163,7 +163,7 @@ export function SignupForm() {
 
               {/* Password */}
               <div className="space-y-1">
-                <label 
+                <label
                   htmlFor="password"
                   className="text-[10px] font-semibold text-[#6B7280] tracking-[0.1em] uppercase"
                 >
@@ -197,11 +197,11 @@ export function SignupForm() {
                   <div className="mt-1 space-y-0.5">
                     <div className="flex items-center gap-2">
                       <div className="flex-1 h-1 bg-[#E5E7EB] rounded-full overflow-hidden">
-                        <div 
+                        <div
                           className="h-full rounded-full transition-all duration-500"
-                          style={{ 
+                          style={{
                             width: `${(strength.score / 4) * 100}%`,
-                            backgroundColor: strength.color 
+                            backgroundColor: strength.color
                           }}
                         />
                       </div>
@@ -232,7 +232,7 @@ export function SignupForm() {
 
               {/* Confirm Password */}
               <div className="space-y-1">
-                <label 
+                <label
                   htmlFor="confirmPassword"
                   className="text-[10px] font-semibold text-[#6B7280] tracking-[0.1em] uppercase"
                 >
@@ -266,8 +266,8 @@ export function SignupForm() {
               </div>
 
               {/* Submit Button */}
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 className="w-full py-2.5 bg-black hover:bg-[#1A1A1A] active:scale-[0.98] rounded-lg text-white font-medium transition-all duration-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.15)] hover:shadow-[0_20px_35px_-8px_rgba(0,0,0,0.2)] disabled:opacity-70 disabled:cursor-not-allowed group mt-1"
                 loading={loading || isSubmitting}
                 disabled={loading || isSubmitting}
@@ -285,8 +285,8 @@ export function SignupForm() {
             <div className="mt-4 text-center">
               <p className="text-sm text-[#6B7280]">
                 Already have an account?{" "}
-                <Link 
-                  href="/login" 
+                <Link
+                  href="/login"
                   className="font-semibold text-black hover:text-[#6B7280] transition-colors inline-flex items-center gap-1 group"
                 >
                   Sign in
@@ -312,16 +312,16 @@ export function SignupForm() {
           {/* ============ RIGHT COLUMN: Black Phone & QR (HIDDEN ON MOBILE) ============ */}
           <div className="hidden lg:flex w-full lg:w-1/2 bg-gray-50/50 items-center justify-center p-6 border-l border-gray-200/50 relative overflow-hidden">
             <div className="absolute inset-0 bg-[radial-gradient(#E5E5E5_1px,transparent_1px)] [background-size:20px_20px] opacity-20" />
-            
+
             {/* Outer Phone Bezel (Matte Black) */}
             <div className="relative w-[270px] h-[520px] bg-[#111111] rounded-[3rem] p-3 shadow-[0_20px_50px_rgba(0,0,0,0.4),inset_0_2px_4px_rgba(255,255,255,0.15),inset_0_-2px_4px_rgba(0,0,0,0.5)] border border-gray-800 flex flex-col">
-              
+
               {/* Dynamic Island Notch */}
               <div className="absolute top-4 left-1/2 -translate-x-1/2 w-20 h-6 bg-black rounded-full z-20 shadow-[inset_0_2px_4px_rgba(255,255,255,0.05)]" />
 
               {/* Inner Phone Screen (Pure White) */}
               <div className="bg-white w-full h-full rounded-[2.2rem] overflow-hidden flex flex-col items-center justify-between pt-14 pb-4 px-3 relative">
-                
+
                 {/* TOP HALF: QR Code Section */}
                 <div className="flex flex-col items-center w-full flex-1 justify-center">
                   <div className="w-32 h-32 bg-black rounded-2xl flex items-center justify-center relative overflow-hidden p-2.5 shadow-[0_10px_30px_rgba(0,0,0,0.1)]">
@@ -330,9 +330,8 @@ export function SignupForm() {
                         {QR_PATTERN.map((filled, i) => (
                           <div
                             key={i}
-                            className={`rounded-[1px] transition-all duration-300 ${
-                              filled ? 'bg-white' : 'bg-transparent'
-                            }`}
+                            className={`rounded-[1px] transition-all duration-300 ${filled ? 'bg-white' : 'bg-transparent'
+                              }`}
                             style={{
                               opacity: filled ? (i % 3 === 0 ? 0.7 : 1) : 0,
                             }}
@@ -341,7 +340,7 @@ export function SignupForm() {
                       </div>
                       <div className="absolute inset-[30%] bg-black rounded-md" />
                       <QrCode className="w-8 h-8 text-white opacity-90" strokeWidth={1} />
-                      
+
                       {/* Scanning Laser Animation */}
                       <div className="absolute inset-0 overflow-hidden rounded-2xl">
                         <div className="absolute left-0 right-0 h-[2px] bg-white/40 shadow-[0_0_20px_rgba(255,255,255,0.3)] animate-scan">
@@ -360,26 +359,26 @@ export function SignupForm() {
                   <div className="w-10 h-10 rounded-full border border-gray-200 text-black flex items-center justify-center mx-auto mb-2 transition-colors group-hover:border-gray-400">
                     <User className="w-4 h-4" strokeWidth={1.5} />
                   </div>
-                  
+
                   <h3 className="text-xs font-bold text-black text-center m-0">John Doe</h3>
                   <span className="text-[10px] text-gray-500 text-center block">CEO of Fintilla</span>
-                  
+
                   <div className="w-full h-px bg-gray-100 my-2"></div>
-                  
+
                   <div className="flex justify-center gap-3 w-full">
                     <a href="#" className="text-gray-400 hover:text-black transition-colors duration-200" aria-label="GitHub">
                       <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-                        <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.03-2.682-.103-.253-.447-1.27.098-2.646 0 0 .84-.269 2.75 1.025.8-.223 1.65-.334 2.5-.334.85 0 1.7.111 2.5.334 1.91-1.294 2.75-1.025 2.75-1.025.545 1.376.201 2.393.099 2.646.64.698 1.03 1.591 1.03 2.682 0 3.841-2.337 4.687-4.565 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
+                        <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.03-2.682-.103-.253-.447-1.27.098-2.646 0 0 .84-.269 2.75 1.025.8-.223 1.65-.334 2.5-.334.85 0 1.7.111 2.5.334 1.91-1.294 2.75-1.025 2.75-1.025.545 1.376.201 2.393.099 2.646.64.698 1.03 1.591 1.03 2.682 0 3.841-2.337 4.687-4.565 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.418 22 12c0-5.523-4.477-10-10-10z" />
                       </svg>
                     </a>
                     <a href="#" className="text-gray-400 hover:text-black transition-colors duration-200" aria-label="Twitter">
                       <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                       </svg>
                     </a>
                     <a href="#" className="text-gray-400 hover:text-black transition-colors duration-200" aria-label="LinkedIn">
                       <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
                       </svg>
                     </a>
                     <a href="#" className="text-gray-400 hover:text-black transition-colors duration-200" aria-label="Email">

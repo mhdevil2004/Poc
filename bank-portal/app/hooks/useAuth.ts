@@ -8,37 +8,117 @@ import type { AuthSession, LoginCredentials, SignupData, User } from "@/types";
 const SESSION_KEY = "bank_portal_session";
 
 const MOCK_USERS: Record<string, { password: string; user: User }> = {
+  // ── Administrator ──────────────────────────────────────────────
+  "admin@fintilla.id": {
+    password: "Admin@123",
+    user: {
+      id: "1",
+      name: "Ahmad Wijaya",
+      email: "admin@fintilla.id",
+      role: "administrator",
+      department: "Administration",
+      phone: "+62 21 5000 0001",
+    },
+  },
+  // Legacy admin alias
   "admin@bank.com": {
     password: "Admin@123",
     user: {
       id: "1",
-      name: "Admin User",
-      email: "admin@bank.com",
-      role: "admin",
+      name: "Ahmad Wijaya",
+      email: "admin@fintilla.id",
+      role: "administrator",
       department: "Administration",
-      phone: "+1 (555) 100-0001",
+      phone: "+62 21 5000 0001",
     },
   },
+
+  // ── Loan Manager ──────────────────────────────────────────────
+  "loan.manager@fintilla.id": {
+    password: "Manager@123",
+    user: {
+      id: "2",
+      name: "Budi Santoso",
+      email: "loan.manager@fintilla.id",
+      role: "loan_manager",
+      department: "Manajemen Pinjaman",
+      phone: "+62 21 5000 0002",
+    },
+  },
+  // Legacy manager alias
   "manager@bank.com": {
     password: "Manager@123",
     user: {
       id: "2",
-      name: "Manager User",
-      email: "manager@bank.com",
-      role: "manager",
-      department: "Loan Management",
-      phone: "+1 (555) 100-0002",
+      name: "Budi Santoso",
+      email: "loan.manager@fintilla.id",
+      role: "loan_manager",
+      department: "Manajemen Pinjaman",
+      phone: "+62 21 5000 0002",
     },
   },
+
+  // ── Risk Analyst ──────────────────────────────────────────────
+  "risk.analyst@fintilla.id": {
+    password: "Analyst@123",
+    user: {
+      id: "3",
+      name: "Dewi Rahayu",
+      email: "risk.analyst@fintilla.id",
+      role: "risk_analyst",
+      department: "Analisis Risiko",
+      phone: "+62 21 5000 0003",
+    },
+  },
+
+  // ── Branch Manager ────────────────────────────────────────────
+  "branch.manager@fintilla.id": {
+    password: "Branch@123",
+    user: {
+      id: "4",
+      name: "Eko Prasetyo",
+      email: "branch.manager@fintilla.id",
+      role: "branch_manager",
+      department: "Manajemen Cabang",
+      phone: "+62 21 5000 0004",
+    },
+  },
+
+  // ── Operations Officer ────────────────────────────────────────
+  "ops.officer@fintilla.id": {
+    password: "Officer@123",
+    user: {
+      id: "5",
+      name: "Fitri Handayani",
+      email: "ops.officer@fintilla.id",
+      role: "operations_officer",
+      department: "Operasional",
+      phone: "+62 21 5000 0005",
+    },
+  },
+  // Legacy officer alias
   "officer@bank.com": {
     password: "Officer@123",
     user: {
-      id: "3",
-      name: "Loan Officer",
-      email: "officer@bank.com",
-      role: "officer",
-      department: "Loan Processing",
-      phone: "+1 (555) 100-0003",
+      id: "5",
+      name: "Fitri Handayani",
+      email: "ops.officer@fintilla.id",
+      role: "operations_officer",
+      department: "Operasional",
+      phone: "+62 21 5000 0005",
+    },
+  },
+
+  // ── Read-Only Auditor ─────────────────────────────────────────
+  "auditor@fintilla.id": {
+    password: "Auditor@123",
+    user: {
+      id: "6",
+      name: "Gunawan Setiawan",
+      email: "auditor@fintilla.id",
+      role: "read_only_auditor",
+      department: "Audit Internal",
+      phone: "+62 21 5000 0006",
     },
   },
 };
@@ -97,14 +177,14 @@ export function useAuth(): UseAuthReturn {
 
       const mockUser = MOCK_USERS[credentials.email.toLowerCase()];
       if (!mockUser || mockUser.password !== credentials.password) {
-        toast.error("Invalid email or password");
+        toast.error("Invalid email or password / Email atau kata sandi tidak valid");
         setLoading(false);
         return false;
       }
 
       const session = saveSession(mockUser.user);
       setUser(session.user);
-      toast.success(`Welcome back, ${session.user.name}!`);
+      toast.success(`Welcome / Selamat datang, ${session.user.name}!`);
       setLoading(false);
       router.push("/dashboard");
       return true;
@@ -127,7 +207,7 @@ export function useAuth(): UseAuthReturn {
 
       const session = saveSession(newUser);
       setUser(session.user);
-      toast.success("Account created successfully!");
+      toast.success("Account created / Akun berhasil dibuat!");
       setLoading(false);
       router.push("/dashboard");
       return true;
@@ -138,7 +218,7 @@ export function useAuth(): UseAuthReturn {
   const logout = useCallback(() => {
     localStorage.removeItem(SESSION_KEY);
     setUser(null);
-    toast.success("Logged out successfully");
+    toast.success("Logged out / Berhasil keluar");
     router.push("/login");
   }, [router]);
 
@@ -152,7 +232,7 @@ export function useAuth(): UseAuthReturn {
       }
       return updated;
     });
-    toast.success("Profile updated successfully!");
+    toast.success("Profile updated / Profil berhasil diperbarui!");
   }, []);
 
   return {
